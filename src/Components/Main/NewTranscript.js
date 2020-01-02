@@ -11,7 +11,9 @@ import {Link} from 'react-router-dom';
 const MainDiv = styled.div`
 display:flex;
 flex-direction:column;
-
+background:rgb(214,211,211);
+width:100vw;
+height:93vh;
 
 `
 const TopDiv = styled.div`
@@ -25,12 +27,12 @@ const TopLeft = styled.div`
 
 `
 const Saved = styled(Link)`
-color:skyblue;
+color:#0D73D9;
 text-decoration:none;
 margin:2%;
 
 :visited{
-    color:skyblue;
+    color:#3082CE;
     text-decoration:none;
 }
 
@@ -41,8 +43,11 @@ flex-direction:column-reverse;
 color:red;
 `
 const Button = styled.button`
-width: 5vw;
-height:5vh;
+width: 7vw;
+height:7vh;
+margin:5px;
+background:#3082CE;
+color:white;
 
 `
 const Right = styled.div`
@@ -63,7 +68,13 @@ height: 40vh;
 }
 `
 export default function NewTranscript() {
-    
+let voice_obj = [{
+    default: true,
+    lang: "en-AU",
+    localService: true,
+    name: "Karen",
+    voiceURI: "Karen"
+  }];
 /*
 This component will have three primary states.
 False === Init
@@ -75,7 +86,7 @@ Editing === Editing a recording so after a recording starts
 
 
 
-
+l
 
 
 */
@@ -83,7 +94,9 @@ Editing === Editing a recording so after a recording starts
     const [value, setValue] = useState("");
     const { speak } = useSpeechSynthesis();
     const { listen, listening, stop } = useSpeechRecognition({
+        
       onResult: result => {
+
         setValue(result);
     }
 });
@@ -106,7 +119,7 @@ Editing === Editing a recording so after a recording starts
                     <p>Voice commands:</p>
                     <p>"Assistant start recording</p>
                     <p>"Assistant stop recording</p>
-                    <Button>Post Note</Button>
+                    <Button type ="submit">Post Note</Button>
                 </Right>
                 </TopDiv>
 

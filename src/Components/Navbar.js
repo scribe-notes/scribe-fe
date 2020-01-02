@@ -8,6 +8,7 @@ display:flex;
 justify-content:flex-start;
 align-items:center;
 border-bottom: 2px solid black;
+background:#3082CE;
 
 `
 const Icon = styled.h1`
@@ -18,12 +19,13 @@ margin:5px;
 
 
 const NavItem = styled(Link)`
-color:black;
+/* color:black; */
+color:white;
 text-decoration:none;
 margin:2%;
 
 :visited{
-    color:black;
+    color:white;
     text-decoration:none;
 }
 
