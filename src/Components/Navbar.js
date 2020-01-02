@@ -54,9 +54,11 @@ margin:2%;
 export default function Navbar() {
     const [token,setToken] = useState(false);
      const [loginstate,setLoginstate]=useState()
-
+        let counter = 0
     useEffect(() => {
         setToken(localStorage.getItem("token"))
+
+        // document.location.reload(true)
         },[])
 
     return (

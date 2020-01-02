@@ -50,6 +50,14 @@ background:#3082CE;
 color:white;
 
 `
+const Buttonz = styled(Link)`
+width: 7vw;
+height:7vh;
+margin:5px;
+background:#3082CE;
+color:white;
+
+`
 const Right = styled.div`
 
 
@@ -62,6 +70,7 @@ justify-content:center;
 align-items:center;
 `
 const Textarea = styled.textarea`
+
 width: 90vw;
 height: 40vh;
 border-radius:2.5%;
@@ -71,13 +80,10 @@ border:2px solid dodgerblue;
 }
 `
 export default function NewTranscript() {
-let voice_obj = [{
-    default: true,
-    lang: "en-AU",
-    localService: true,
-    name: "Karen",
-    voiceURI: "Karen"
-  }];
+    const [pitch, setPitch] = useState(1);
+    const [rate, setRate] = useState(1);
+    const [voiceIndex, setVoiceIndex] = useState(null);
+
 /*
 This component will have three primary states.
 False === Init
@@ -95,7 +101,8 @@ l
 */
      const [token, setToken] = useState(false)
     const [value, setValue] = useState("");
-    const { speak } = useSpeechSynthesis();
+    const { speak,voices } = useSpeechSynthesis();
+    const voice = voices[voiceIndex] || null;
     const { listen, listening, stop } = useSpeechRecognition({
         
       onResult: result => {
@@ -116,9 +123,22 @@ if(token===null){
                 <TopLeft>
                 <Saved>◄ Saved Transcripts</Saved>
                 <h1>New Transcript</h1>
+                <select
+              id="voice"
+              name="voice"
+              value={voiceIndex || ''}
+              onChange={(event) => { setVoiceIndex(event.target.value); }}
+            >
+              <option value="">Default</option>
+              {voices.map((option, index) => (
+                <option key={option.voiceURI} value={index}>
+                  {`${option.lang} - ${option.name}`}
+                </option>
+              ))}
+            </select>
                 <Button onClick={listen} ><FaPlayCircle/></Button>
                 <Button onClick ={stop}><FaPauseCircle/></Button>
-                <Button onClick={() => speak({ text: value })}><AiFillSound/></Button>
+                <Button onClick={() => speak({ text: value,voice, rate, pitch})}><AiFillSound/></Button>
                 </TopLeft>
                 <RecordingDiv>
                     {listening && <div>Speak into the mic</div>}
@@ -133,6 +153,7 @@ if(token===null){
 
                 <TextareaContainer>
                     <Textarea
+                        disabled
                         value={value}
                         onChange={event => setValue(event.target.value)}
                     />
