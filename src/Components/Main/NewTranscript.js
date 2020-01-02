@@ -83,6 +83,7 @@ export default function NewTranscript() {
     const [pitch, setPitch] = useState(1);
     const [rate, setRate] = useState(1);
     const [voiceIndex, setVoiceIndex] = useState(null);
+    const [next,setNext] = useState(false)
 
 /*
 This component will have three primary states.
@@ -113,55 +114,75 @@ l
 useEffect(() => {
 setToken(localStorage.getItem("token"))
 },[])
+
+const NextHandler = () => {
+    return setNext(true)
+}
 if(token===null){
     return <Redirect to="/login"/>
   }
+        if(next === false){
+            return (
+                <MainDiv>
+                    <TopDiv>
+                    <TopLeft>
+                    <Saved>◄ Saved Transcripts</Saved>
+                    <h1>New Transcript</h1>
+                    <select
+                  id="voice"
+                  name="voice"
+                  value={voiceIndex || ''}
+                  onChange={(event) => { setVoiceIndex(event.target.value); }}
+                >
+                  <option value="">Default</option>
+                  {voices.map((option, index) => (
+                    <option key={option.voiceURI} value={index}>
+                      {`${option.lang} - ${option.name}`}
+                    </option>
+                  ))}
+                </select>
+                    <Button onClick={listen} ><FaPlayCircle/></Button>
+                    <Button onClick ={stop}><FaPauseCircle/></Button>
+                    <Button onClick={() => speak({ text: value,voice, rate, pitch})}><AiFillSound/></Button>
+                    </TopLeft>
+                    <RecordingDiv>
+                        {listening && <div>Speak into the mic</div>}
+                    </RecordingDiv>
+                    <Right>
+                        <p>Voice commands:</p>
+                        <p>"Assistant start recording</p>
+                        <p>"Assistant stop recording</p>
+                        <Button onClick = {setNext(true)}>Next</Button>
+                    </Right>
+                    </TopDiv>
+    
+                    <TextareaContainer>
+                        <Textarea
+                            disabled
+                            value={value}
+                            onChange={event => setValue(event.target.value)}
+                        />
+                    </TextareaContainer>
+    
+    
+                </MainDiv>
+            )   
+        }else{
+            return(
+                <MainDiv>
+                    <TopDiv>
 
-        return (
-            <MainDiv>
-                <TopDiv>
-                <TopLeft>
-                <Saved>◄ Saved Transcripts</Saved>
-                <h1>New Transcript</h1>
-                <select
-              id="voice"
-              name="voice"
-              value={voiceIndex || ''}
-              onChange={(event) => { setVoiceIndex(event.target.value); }}
-            >
-              <option value="">Default</option>
-              {voices.map((option, index) => (
-                <option key={option.voiceURI} value={index}>
-                  {`${option.lang} - ${option.name}`}
-                </option>
-              ))}
-            </select>
-                <Button onClick={listen} ><FaPlayCircle/></Button>
-                <Button onClick ={stop}><FaPauseCircle/></Button>
-                <Button onClick={() => speak({ text: value,voice, rate, pitch})}><AiFillSound/></Button>
-                </TopLeft>
-                <RecordingDiv>
-                    {listening && <div>Speak into the mic</div>}
-                </RecordingDiv>
-                <Right>
-                    <p>Voice commands:</p>
-                    <p>"Assistant start recording</p>
-                    <p>"Assistant stop recording</p>
-                    <Button type ="submit">Post Note</Button>
-                </Right>
-                </TopDiv>
+                    </TopDiv>
+                    <TextareaContainer>
+                        <Textarea
+                            value={value}
+                            onChange={event => setValue(event.target.value)}
+                        />
+                    </TextareaContainer>
+                </MainDiv>
+            )
+        }
 
-                <TextareaContainer>
-                    <Textarea
-                        disabled
-                        value={value}
-                        onChange={event => setValue(event.target.value)}
-                    />
-                </TextareaContainer>
-
-
-            </MainDiv>
-        )   
 
 
 }
