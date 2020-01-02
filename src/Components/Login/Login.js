@@ -7,12 +7,17 @@ import {
   Button,
   PseudoBox} from '@chakra-ui/core'
 import { Box, Heading} from '@chakra-ui/core'
-
-
-
+import styled from 'styled-components'
 import './LoginForm.css'
 
+const ErrorMessage = styled.p`
+color:red;
+
+`
+
+
 const Login = (props) => {
+    const [error,setError] = useState()
   const [input, setInput] = useState({
     username: '',
     password: ''
@@ -23,7 +28,7 @@ const Login = (props) => {
  
   
   const handleChange = e => {
-    
+
     setInput({
       ...input,
       [e.target.name]: e.target.value
@@ -35,23 +40,29 @@ const Login = (props) => {
     axios
     .post('https://hackathon-livenotes.herokuapp.com/login', input)
     .then(res => {
+        setError(false)
       console.log('login submit results', res)
       window.localStorage.setItem('token', JSON.stringify(res.data.access_token))
       props.history.push('/')
     })
     .catch(err => {
       console.error(err)
+      setError(err.response.data.message)
     })
     //Sweet alert 
-    Swal.fire({
-      position: 'center',
-      type: 'success',
-      title: 'Welcome Back!',
-      showConfirmButton: false,
-      timer: 2500
-    })
+
   }
   
+  if(error === false){
+    Swal.fire({
+        position:"center",
+        icon: 'success',
+        title: 'Welcome to Live Notes!',
+        showConfirmButton: false,
+        timer: 1500
+  
+      })
+}
   if(token){
     return <Redirect to="/"/>
   }
@@ -62,12 +73,7 @@ const Login = (props) => {
         <Box p={5} shadow="lg" borderWidth="2px" rounded="lg" className="form-container">
           <h1 className="heading">Log in to your account.</h1>
              <div className="auth-links">
-               <div className="auth-link">
-         
-               </div>
-               <div className="auth-link">
-
-               </div>
+  <ErrorMessage>{error}</ErrorMessage>
              </div>
             <form onSubmit={handleLoginSubmit} className="login-form">
                 <input

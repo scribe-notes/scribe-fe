@@ -14,6 +14,7 @@ color:red;
 
 const Signup = (props) => {
     const [error,setError] = useState()
+    
   const [input, setInput] = useState({
     username: '',
     password: ''
@@ -35,6 +36,7 @@ const Signup = (props) => {
     .post('https://hackathon-livenotes.herokuapp.com/users', input)
     .then(res => {
       console.log('login submit results', res)
+      setError(false)
       // window.localStorage.setItem('token', JSON.stringify(res.data.access_token))
       props.history.push('/login')
     })
@@ -45,14 +47,19 @@ const Signup = (props) => {
     //   setError(err.data.message)
     //   console.log(err.data.message)
     })
-    Swal.fire({
-      position: 'center',
-    //   type: 'success',
-      title: 'Welcome Back!',
-      showConfirmButton: false,
-      timer: 2500
-    })
+
+
   }
+  if(error === false){
+    Swal.fire({
+        position:"center",
+        icon: 'success',
+        title: 'Thanks for signing up!',
+        showConfirmButton: false,
+        timer: 1500
+  
+      })
+}
     
 //   if(token){
 //     return <Redirect to="/"/>
@@ -96,7 +103,7 @@ const Signup = (props) => {
                     "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
                 }}
               >
-                Sign In
+                Login
               </PseudoBox>
           </Link>
         </div>
@@ -126,7 +133,7 @@ const Signup = (props) => {
                   type='password'
                 />
                 <Button variantColor='blue' width="60%" rounded="20px" onClick={handleLoginSubmit}>
-                  Signup
+                  Sign up
                 </Button>
             </form>
         </Box>

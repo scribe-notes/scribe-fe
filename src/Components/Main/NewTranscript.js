@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { useSpeechRecognition,useSpeechSynthesis  } from "react-speech-kit";
 import {FaPlayCircle,FaPauseCircle} from 'react-icons/fa';
 import {AiFillSound} from 'react-icons/ai'
-import {Link} from 'react-router-dom';
+import {Link,Redirect} from 'react-router-dom';
 
 
 
@@ -90,7 +90,7 @@ l
 
 
 */
-    const [recording,setRecording] = useState("")
+     const [token, setToken] = useState(false)
     const [value, setValue] = useState("");
     const { speak } = useSpeechSynthesis();
     const { listen, listening, stop } = useSpeechRecognition({
@@ -100,13 +100,18 @@ l
         setValue(result);
     }
 });
-
+useEffect(() => {
+setToken(localStorage.getItem("token"))
+},[])
+if(token===null){
+    return <Redirect to="/login"/>
+  }
 
         return (
             <MainDiv>
                 <TopDiv>
                 <TopLeft>
-                <Saved>◄Saved Transcripts</Saved>
+                <Saved>◄ Saved Transcripts</Saved>
                 <h1>New Transcript</h1>
                 <Button onClick={listen} ><FaPlayCircle/></Button>
                 <Button onClick ={stop}><FaPauseCircle/></Button>
