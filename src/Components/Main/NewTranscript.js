@@ -56,6 +56,7 @@ const Right = styled.div`
 `
 const TextareaContainer = styled.div`
 width:100vw;
+
 display:flex;
 justify-content:center;
 align-items:center;
@@ -63,6 +64,8 @@ align-items:center;
 const Textarea = styled.textarea`
 width: 90vw;
 height: 40vh;
+border-radius:2.5%;
+border:2px solid dodgerblue;
 &:focus{
     color:black;
 }
