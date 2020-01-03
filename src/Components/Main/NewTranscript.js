@@ -38,6 +38,7 @@ export default function NewTranscript(props) {
 
   const NextHandler = () => {
     console.log(history);
+    if(listening) StopAndTime();
     setHistory([
       ...history,
       {
@@ -48,17 +49,13 @@ export default function NewTranscript(props) {
     return setNext(true);
   };
 
-  let start;
   const ListenAndTime = () => {
-    start = Date.now();
-    console.log(start);
+    setRecordingLength(Date.now());
 
     listen({ interimResults: false });
   };
-  let end;
   const StopAndTime = () => {
-    end = Date.now();
-    setRecordingLength(end - start);
+    setRecordingLength(Math.round((Date.now() - recordingLength) / 1000));
     console.log(recordingLength, "recording");
     stop();
   };
@@ -103,7 +100,7 @@ export default function NewTranscript(props) {
               <div className="button" onClick={ListenAndTime}>
                 <FaCircle />
               </div>
-              <div className="button" onClick={stop}>
+              <div className="button" onClick={StopAndTime}>
                 <FaStopCircle />
               </div>
               <div

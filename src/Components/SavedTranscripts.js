@@ -21,6 +21,7 @@ export default function SavedTranscripts() {
             <h2>Saved Transcripts</h2>
             <div className='list'>
             {data && data.length > 0 ? data.map(transcript => {
+                if(!transcript) return null;
                 return <SavedTranscriptsCards key={transcript._id} {...transcript} />
             }) : <p className='empty'>You have no transcripts! <Link to='/new'>Create one now</Link></p>}
             </div>
