@@ -1,80 +1,28 @@
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
 import { useSpeechRecognition, useSpeechSynthesis } from "react-speech-kit";
-import { FaPlayCircle, FaPauseCircle } from "react-icons/fa";
+import { FaStopCircle, FaCircle } from "react-icons/fa";
 import { AiFillSound } from "react-icons/ai";
 import { Link, Redirect } from "react-router-dom";
 
-const MainDiv = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: rgb(214, 211, 211);
-  width: 100vw;
-  height: 93vh;
-`;
-const TopDiv = styled.div`
-  display: flex;
-  justify-content: space-evenly;
-`;
-const TopLeft = styled.div``;
-const Saved = styled(Link)`
-  color: #0d73d9;
-  text-decoration: none;
-  margin: 2%;
+import "./NewTranscript.scss";
 
-  :visited {
-    color: #3082ce;
-    text-decoration: none;
-  }
-`;
-const RecordingDiv = styled.div`
-  display: flex;
-  flex-direction: column-reverse;
-  color: red;
-`;
-const Button = styled.button`
-  width: 7vw;
-  height: 7vh;
-  margin: 5px;
-  background: #3082ce;
-  color: white;
-`;
-const Buttonz = styled(Link)`
-  width: 7vw;
-  height: 7vh;
-  margin: 5px;
-  background: #3082ce;
-  color: white;
-`;
-const Right = styled.div``;
-const TextareaContainer = styled.div`
-  width: 100vw;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-const Textarea = styled.textarea`
-  width: 90vw;
-  height: 40vh;
-  border-radius: 2.5%;
-  border: 2px solid dodgerblue;
-  &:focus {
-    color: black;
-  }
-`;
 export default function NewTranscript() {
   const [voiceIndex, setVoiceIndex] = useState(null);
   const [next, setNext] = useState(false);
   const [token, setToken] = useState(false);
   const [value, setValue] = useState("");
+  const [newValue, setNewValue] = useState("");
   const { speak, voices } = useSpeechSynthesis();
   const voice = voices[voiceIndex] || null;
+
+  useEffect(() => {
+    setValue(value + " " + newValue);
+  }, [newValue]);
+
   const { listen, listening, stop } = useSpeechRecognition({
-    onResult: result => {
-      setValue(result);
-    }
+    onResult: result => setNewValue(result)
   });
+
   useEffect(() => {
     setToken(localStorage.getItem("token"));
   }, []);
@@ -87,10 +35,9 @@ export default function NewTranscript() {
     return <Redirect to="/login" />;
   } else if (!next) {
     return (
-      <MainDiv>
-        <TopDiv>
-          <TopLeft>
-            <Saved>◄ Saved Transcripts</Saved>
+      <div className="new-transcript">
+        <div className="controls">
+          <div className="left">
             <h1>New Transcript</h1>
             <select
               id="voice"
@@ -107,47 +54,49 @@ export default function NewTranscript() {
                 </option>
               ))}
             </select>
-            <Button onClick={listen}>
-              <FaPlayCircle />
-            </Button>
-            <Button onClick={stop}>
-              <FaPauseCircle />
-            </Button>
-            <Button onClick={() => speak({ text: value, voice, rate: 1, pitch: 1 })}>
-              <AiFillSound />
-            </Button>
-          </TopLeft>
-          <RecordingDiv>
-            {listening && <div>Speak into the mic</div>}
-          </RecordingDiv>
-          <Right>
-            <p>Voice commands:</p>
-            <p>"Assistant start recording</p>
-            <p>"Assistant stop recording</p>
-            <Button onClick={() => setNext(true)}>Next</Button>
-          </Right>
-        </TopDiv>
+            <div className="buttons">
+              <div
+                className="button"
+                onClick={() => listen({ interimResults: false })}
+              >
+                <FaCircle />
+              </div>
+              <div className="button" onClick={stop}>
+                <FaStopCircle />
+              </div>
+              <div
+                className="button"
+                onClick={() => speak({ text: value, voice, rate: 1, pitch: 1 })}
+              >
+                <AiFillSound />
+              </div>
+            </div>
+          </div>
+          {listening && (
+            <div className="center">
+              <div className="rec">.</div>
+              <h2>RECORDING...</h2>
+            </div>
+          )}
+          <div className="right">
+            <div className="button" onClick={() => setNext(true)}>
+              Next
+            </div>
+          </div>
+        </div>
 
-        <TextareaContainer>
-          <Textarea
-            disabled
-            value={value}
-            onChange={event => setValue(event.target.value)}
-          />
-        </TextareaContainer>
-      </MainDiv>
+        <textarea className='text' readOnly value={value} />
+      </div>
     );
   } else {
     return (
-      <MainDiv>
-        <TopDiv></TopDiv>
-        <TextareaContainer>
-          <Textarea
-            value={value}
-            onChange={event => setValue(event.target.value)}
-          />
-        </TextareaContainer>
-      </MainDiv>
+      <div className="new-transcript">
+        <div className="controls"></div>
+        <textarea
+          value={value}
+          onChange={event => setValue(event.target.value)}
+        />
+      </div>
     );
   }
 }
