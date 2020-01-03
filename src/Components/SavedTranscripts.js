@@ -7,7 +7,7 @@ export default function SavedTranscripts() {
     useEffect(() => {
         AxiosWithAuth().get('https://hackathon-livenotes.herokuapp.com/transcripts/mine')
         .then(res => {
-            setData(res.data)
+            setData(res.data);
         }).catch(err => {
             console.error(err.response)
         })
@@ -15,8 +15,9 @@ export default function SavedTranscripts() {
     
     return (
         <div>
-            {data && data.length > 0 ? data.map(x => {
-                return <SavedTranscriptsCards x={x}/>
+            {data && data.length > 0 ? data.map(transcript => {
+                console.log(transcript);
+                return <SavedTranscriptsCards key={transcript.id} {...transcript} />
             }) : <p className='empty'>You have no transcripts! <Link to='/new'>Create one now</Link></p>}
         </div>
     )
