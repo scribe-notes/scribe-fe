@@ -10,8 +10,6 @@ export default function Navbar() {
 
     const { setHistory } = useContext(HistoryContext);
 
-     const [loginstate,setLoginstate]=useState()
-        let counter = 0
     useEffect(() => {
         setToken(localStorage.getItem("token"))
 

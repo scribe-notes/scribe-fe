@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useSpeechRecognition, useSpeechSynthesis } from "react-speech-kit";
 import { FaStopCircle, FaCircle } from "react-icons/fa";
 import { AiFillSound } from "react-icons/ai";
-import { Link, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import AxiosWithAuth from "./AxiosWithAuth";
 
 import HistoryContext from "../../contexts/HistoryContext";
@@ -22,9 +22,11 @@ export default function NewTranscript(props) {
 
   const { history, setHistory } = useContext(HistoryContext);
 
-  useEffect(() => {
+  const update = () => {
     setValue(value + " " + newValue);
-  }, [newValue]);
+  }
+
+  useEffect(update, [newValue]);
 
   const { listen, listening, stop } = useSpeechRecognition({
     onResult: result => setNewValue(result)
@@ -62,7 +64,7 @@ export default function NewTranscript(props) {
   };
   const HandlePost = e => {
     e.preventDefault();
-    let obj = { data: value, recordingLength: "0", title: title };
+    let obj = { data: value, recordingLength: recordingLength.toString() , title };
     AxiosWithAuth()
       .post("https://hackathon-livenotes.herokuapp.com/transcripts", obj)
       .then(res => {

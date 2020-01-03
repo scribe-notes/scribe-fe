@@ -1,0 +1,10 @@
+.saved-transcripts {
+  display: flex;
+  flex-direction: column;
+  margin: 16px;
+
+  .list {
+    display: flex;
+    flex-flow: row wrap;
+  }
+}
