@@ -4,7 +4,8 @@ import { useSpeechRecognition,useSpeechSynthesis  } from "react-speech-kit";
 import {FaPlayCircle,FaPauseCircle} from 'react-icons/fa';
 import {AiFillSound} from 'react-icons/ai'
 import {Link,Redirect} from 'react-router-dom';
-
+import axios from 'axios'
+import AxiosWithAuth from './AxiosWithAuth';
 
 
 
@@ -129,15 +130,21 @@ border:2px solid dodgerblue;
 `
 
 export default function NewTranscript(props) {
+//===========State && Variables================//
     let backtrack = false;
+    let start;
+    let recordingLength;
     const [pitch, setPitch] = useState(1);
+    const [title,setTitle] = useState("")
     const [rate, setRate] = useState(1);
-    let speech_string =""
     const [voiceIndex, setVoiceIndex] = useState(null);
     const [next,setNext] = useState('false')
      const [token, setToken] = useState(false)
     const [value, setValue] = useState("");
     const { speak,voices } = useSpeechSynthesis();
+
+
+
     const voice = voices[voiceIndex] || null;
     const { listen, listening, stop } = useSpeechRecognition({
         
@@ -149,6 +156,19 @@ export default function NewTranscript(props) {
         // console.log(speech_string)
     }
 });
+/*
+Values needed for post
+
+title === string
+recordingLength === int
+data === value
+
+
+
+
+
+
+*/
 useEffect(() => {
 setToken(localStorage.getItem("token"))
 },[])
@@ -160,6 +180,30 @@ if(token===null){
     return <Redirect to="/login"/>
   }
 
+const ListenAndTime = () => {
+    start = Date.now();
+    console.log(start)
+
+    listen();
+}
+let end;
+const StopAndTime = () => {
+    end = Date.now();
+    recordingLength = end - start
+    console.log(recordingLength,'recording')
+    stop();
+}
+const HandlePost = (e) => {
+    e.preventDefault();
+    let obj = {data:value,recordingLength:'0',title:title}
+    AxiosWithAuth().post('https://hackathon-livenotes.herokuapp.com/transcripts',obj)
+    .then(res => {
+        console.log(res)
+    }).catch(err => {
+        console.error(err.response)
+    })
+
+}
 
         if(next === 'false'){
             return (
@@ -181,8 +225,8 @@ if(token===null){
                     </option>
                   ))}
                 </select>
-                    <Button onClick={listen} ><FaPlayCircle/></Button>
-                    <Button onClick ={stop}><FaPauseCircle/></Button>
+                    <Button onClick={() =>ListenAndTime()} ><FaPlayCircle/></Button>
+                    <Button onClick ={() => StopAndTime()}><FaPauseCircle/></Button>
                     <Button onClick={() => speak({ text: value,voice, rate, pitch})}><AiFillSound/></Button>
                     </TopLeft>
                     <RecordingDiv>
@@ -223,13 +267,14 @@ if(token===null){
                     <NextRight>
                         <ButtonContainer>
                         <ButtonLong  onClick={() =>document.location.reload()}>DISCARD</ButtonLong>
-                        <ButtonLong2>FINISH</ButtonLong2>
+                        <ButtonLong2 onClick={HandlePost}>FINISH</ButtonLong2>
                         <button onClick={() => speak({ text: value,voice, rate, pitch})}><AiFillSound/></button>
                         </ButtonContainer>
 
                     </NextRight>
                     </TopNextDiv>
                     <TextareaContainer>
+                        <input onChange={e => setTitle(e.target.value)}/>
                         <Textarea
                             value={value}
                             onChange={event => setValue(event.target.value)}

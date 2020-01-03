@@ -42,7 +42,7 @@ const Login = (props) => {
     .then(res => {
         setError(false)
       console.log('login submit results', res)
-      window.localStorage.setItem('token', JSON.stringify(res.data.access_token))
+      window.localStorage.setItem('token', res.data.token)
       props.history.push('/')
     })
     .catch(err => {
