@@ -7,13 +7,7 @@ import {
   Button,
   PseudoBox} from '@chakra-ui/core'
 import { Box, Heading} from '@chakra-ui/core'
-import styled from 'styled-components'
 import './LoginForm.css'
-
-const ErrorMessage = styled.p`
-color:red;
-
-`
 
 
 const Login = (props) => {
@@ -42,7 +36,7 @@ const Login = (props) => {
     .then(res => {
         setError(false)
       console.log('login submit results', res)
-      window.localStorage.setItem('token', res.data.token)
+      localStorage.setItem('token', res.data.token)
       props.history.push('/')
     })
     .catch(err => {
@@ -73,7 +67,7 @@ const Login = (props) => {
         <Box p={5} shadow="lg" borderWidth="2px" rounded="lg" className="form-container">
           <h1 className="heading">Log in to your account.</h1>
              <div className="auth-links">
-  <ErrorMessage>{error}</ErrorMessage>
+  <div>{error}</div>
              </div>
             <form onSubmit={handleLoginSubmit} className="login-form">
                 <input

@@ -1,289 +1,165 @@
-import React,{useState,useEffect} from 'react'
-import styled from 'styled-components'
-import { useSpeechRecognition,useSpeechSynthesis  } from "react-speech-kit";
-import {FaPlayCircle,FaPauseCircle} from 'react-icons/fa';
-import {AiFillSound} from 'react-icons/ai'
-import {Link,Redirect} from 'react-router-dom';
-import axios from 'axios'
+import React, { useState, useEffect, useContext } from "react";
+import { useSpeechRecognition, useSpeechSynthesis } from "react-speech-kit";
+import { FaStopCircle, FaCircle } from "react-icons/fa";
+import { AiFillSound } from "react-icons/ai";
+import { Link, Redirect } from "react-router-dom";
 import AxiosWithAuth from './AxiosWithAuth';
 
+import HistoryContext from '../../contexts/HistoryContext';
 
+import "./NewTranscript.scss";
 
-const MainDiv = styled.div`
-display:flex;
-flex-direction:column;
-background:rgb(214,211,211);
-width:100vw;
-height:93vh;
+export default function NewTranscript() {
+  const [voiceIndex, setVoiceIndex] = useState(null);
+  const [next, setNext] = useState(false);
+  const [token, setToken] = useState(false);
+  const [recordingLength, setRecordingLength] = useState(0);
+  const [title, setTitle] = useState('');
+  const [value, setValue] = useState("");
+  const [newValue, setNewValue] = useState("");
+  const { speak, voices } = useSpeechSynthesis();
+  const voice = voices[voiceIndex] || null;
 
-`
-const TopDiv = styled.div`
-display:flex;
-justify-content:space-evenly;
+  const {history, setHistory} = useContext(HistoryContext);
 
+  useEffect(() => {
+    setValue(value + " " + newValue);
+  }, [newValue]);
 
-`
-const TopLeft = styled.div`
+  const { listen, listening, stop } = useSpeechRecognition({
+    onResult: result => setNewValue(result)
+  });
 
+  useEffect(() => {
+    setToken(localStorage.getItem("token"));
+  }, []);
 
-`
-const Saved = styled(Link)`
-color:#0D73D9;
-text-decoration:none;
-margin:2%;
+  const NextHandler = () => {
+    console.log(history);
+    setHistory([...history, {
+        title: 'New Transcript',
+        path: '/new'
+    }]);
+    return setNext(true);
+  };
 
-:visited{
-    color:#3082CE;
-    text-decoration:none;
-}
-
-`
-const RecordingDiv = styled.div`
-display:flex;
-flex-direction:column-reverse;
-color:red;
-`
-const Button = styled.button`
-width: 7vw;
-height:7vh;
-margin:5px;
-background:#3082CE;
-color:white;
-:hover{
-    background:white;
-    color:#3082CE;
-}
-
-`
-const Buttonz = styled(Link)`
-width: 7vw;
-height:7vh;
-margin:5px;
-background:#3082CE;
-color:white;
-
-`
-const TopNextDiv = styled.div`
-display:flex;
-margin:5%;
-
-`
-const NextLeft = styled.div`
-
-`
-const NextRight = styled.div`
-display:flex;
-flex-direction:column-reverse;
-
-`
-const ButtonContainer = styled.div`
-display:flex;
-
-`
-
-const ButtonLong = styled.button`
-width:20vw;
-height:30px;
-background:red;
-color:white;
-
-:visited{
-    color:white;
-}
-:hover{
-    background:white;
-    color:red;
-}
-
-`
-const ButtonLong2 = styled.button`
-width:20vw;
-height:30px;
-background:#3082CE;
-color:white;
-:hover{
-    background:white;
-    color:#3082CE;
-}
-
-`
-const Right = styled.div`
-
-
-`
-const TextareaContainer = styled.div`
-width:100vw;
-
-display:flex;
-justify-content:center;
-align-items:center;
-`
-const Textarea = styled.textarea`
-
-width: 90vw;
-height: 40vh;
-border-radius:2.5%;
-border:2px solid dodgerblue;
-&:focus{
-    color:black;
-}
-`
-
-export default function NewTranscript(props) {
-//===========State && Variables================//
-    let backtrack = false;
-    let start;
-    let recordingLength;
-    const [pitch, setPitch] = useState(1);
-    const [title,setTitle] = useState("")
-    const [rate, setRate] = useState(1);
-    const [voiceIndex, setVoiceIndex] = useState(null);
-    const [next,setNext] = useState('false')
-     const [token, setToken] = useState(false)
-    const [value, setValue] = useState("");
-    const { speak,voices } = useSpeechSynthesis();
-
-
-
-    const voice = voices[voiceIndex] || null;
-    const { listen, listening, stop } = useSpeechRecognition({
-        
-      onResult: result => {
-        console.log(result)
-        setValue(result)
-        // setValue(result);
-        // speech_string += result
-        // console.log(speech_string)
-    }
-});
-/*
-Values needed for post
-
-title === string
-recordingLength === int
-data === value
-
-
-
-
-
-
-*/
-useEffect(() => {
-setToken(localStorage.getItem("token"))
-},[])
-
-if(backtrack === true){
-    return <Redirect to="/"/>
-}
-if(token===null){
-    return <Redirect to="/login"/>
-  }
-
-const ListenAndTime = () => {
+  let start;
+  const ListenAndTime = () => {
     start = Date.now();
-    console.log(start)
+    console.log(start);
 
-    listen();
-}
-let end;
-const StopAndTime = () => {
+    listen({ interimResults: false });
+  };
+  let end;
+  const StopAndTime = () => {
     end = Date.now();
-    recordingLength = end - start
-    console.log(recordingLength,'recording')
+    setRecordingLength(end - start);
+    console.log(recordingLength, "recording");
     stop();
-}
-const HandlePost = (e) => {
+  };
+  const HandlePost = e => {
     e.preventDefault();
-    let obj = {data:value,recordingLength:'0',title:title}
-    AxiosWithAuth().post('https://hackathon-livenotes.herokuapp.com/transcripts',obj)
-    .then(res => {
-        console.log(res)
-    }).catch(err => {
-        console.error(err.response)
-    })
+    let obj = { data: value, recordingLength: "0", title: title };
+    AxiosWithAuth()
+      .post("https://hackathon-livenotes.herokuapp.com/transcripts", obj)
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        console.error(err.response);
+      });
+  };
 
-}
+  if (token === null) {
+    return <Redirect to="/login" />;
+  } else if (!next) {
+    return (
+      <div className="new-transcript">
+        <div className="controls">
+          <div className="left">
+            <h1>New Transcript</h1>
+            <select
+              id="voice"
+              name="voice"
+              value={voiceIndex || ""}
+              onChange={event => {
+                setVoiceIndex(event.target.value);
+              }}
+            >
+              <option value="">Default</option>
+              {voices.map((option, index) => (
+                <option key={option.voiceURI} value={index}>
+                  {`${option.lang} - ${option.name}`}
+                </option>
+              ))}
+            </select>
+            <div className="buttons">
+              <div
+                className="button"
+                onClick={ListenAndTime}
+              >
+                <FaCircle />
+              </div>
+              <div className="button" onClick={stop}>
+                <FaStopCircle />
+              </div>
+              <div
+                className="button"
+                onClick={() => speak({ text: value, voice, rate: 1, pitch: 1 })}
+              >
+                <AiFillSound />
+              </div>
+            </div>
+          </div>
+          {listening && (
+            <div className="center">
+              <div className="rec">.</div>
+              <h2>RECORDING...</h2>
+            </div>
+          )}
+          <div className="right">
+            <div className="button" onClick={NextHandler}>
+              Next
+            </div>
+          </div>
+        </div>
 
-        if(next === 'false'){
-            return (
-                <MainDiv>
-                    <TopDiv>
-                    <TopLeft>
-                    <Saved>◄ Saved Transcripts</Saved>
-                    <h1>New Transcript</h1>
-                    <select
-                  id="voice"
-                  name="voice"
-                  value={voiceIndex || ''}
-                  onChange={(event) => { setVoiceIndex(event.target.value); }}
-                >
-                  <option value="">Default</option>
-                  {voices.map((option, index) => (
-                    <option key={option.voiceURI} value={index}>
-                      {`${option.lang} - ${option.name}`}
-                    </option>
-                  ))}
-                </select>
-                    <Button onClick={() =>ListenAndTime()} ><FaPlayCircle/></Button>
-                    <Button onClick ={() => StopAndTime()}><FaPauseCircle/></Button>
-                    <Button onClick={() => speak({ text: value,voice, rate, pitch})}><AiFillSound/></Button>
-                    </TopLeft>
-                    <RecordingDiv>
-                        {listening && <div>Speak into the mic</div>}
-                    </RecordingDiv>
-                    <Right>
-                        <p>Voice commands:</p>
-                        <p>"Assistant start recording</p>
-                        <p>"Assistant stop recording</p>
-                        <Button onClick = {() =>setNext(true)}>Next</Button>
-                    </Right>
-                    </TopDiv>
-    
-                    <TextareaContainer>
-                        <Textarea
-                            disabled
-                            value={value}
-                            onChange={event => setValue(event.target.value)}
-                        />
-                    </TextareaContainer>
-    
-    
-                </MainDiv>
-            )   
-        }else{
-            return(
-                <MainDiv>
-                    <TopNextDiv>
-                    <NextLeft>
-                    <Saved>New Transcript</Saved>
-                    <h1>Save Transcript</h1>
-                    <p>Please Review the fillowing transcript and make corrections as needed.</p>
-                    <p>Click Finish when done</p>
-                    <p>Or Discard to exit</p>
-
-                    
-                    </NextLeft>
-                    <NextRight>
-                        <ButtonContainer>
-                        <ButtonLong  onClick={() =>document.location.reload()}>DISCARD</ButtonLong>
-                        <ButtonLong2 onClick={HandlePost}>FINISH</ButtonLong2>
-                        <button onClick={() => speak({ text: value,voice, rate, pitch})}><AiFillSound/></button>
-                        </ButtonContainer>
-
-                    </NextRight>
-                    </TopNextDiv>
-                    <TextareaContainer>
-                        <input onChange={e => setTitle(e.target.value)}/>
-                        <Textarea
-                            value={value}
-                            onChange={event => setValue(event.target.value)}
-                        />
-                    </TextareaContainer>
-                </MainDiv>
-            )
-        }
-
-
-
+        <textarea className="text" readOnly value={value} />
+      </div>
+    );
+  } else {
+    return (
+      <div className="new-transcript">
+        <div className="controls">
+          <div className="left">
+            <h1>Save Transcript</h1>
+            <p>
+              Please Review the fillowing transcript and make corrections as
+              needed.
+            </p>
+            <p>Click Finish when done</p>
+            <p>Or Discard to exit</p>
+          </div>
+        </div>
+        <div className="right">
+          <div className="buttons">
+            <div className="button" onClick={() => document.location.reload()}>
+              DISCARD
+            </div>
+            <div className="button" onClick={HandlePost}>
+              FINISH
+            </div>
+            <button onClick={() => speak({ text: value, voice, rate: 1, pitch: 1 })}>
+              <AiFillSound />
+            </button>
+          </div>
+        </div>
+        <input onChange={e => setTitle(e.target.value)} />
+        <textarea
+          value={value}
+          onChange={event => setValue(event.target.value)}
+        />
+      </div>
+    );
+  }
 }

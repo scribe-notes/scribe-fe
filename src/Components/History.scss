@@ -1,0 +1,27 @@
+.history {
+  padding: 0px 32px;
+  font-weight: bold;
+  color: dodgerblue;
+  user-select: none;
+  cursor: pointer;
+  background-color: rgb(247, 247, 247);
+
+  .content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    .arrow {
+      padding: 8px;
+      height: 32px;
+    }
+
+    p {
+      font-size: 20px;
+      transition: all 0.1s ease-in-out;
+    }
+
+    p:hover {
+      color: rgb(109, 182, 255);
+    }
+  }
+}

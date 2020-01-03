@@ -4,12 +4,8 @@ import axios from "axios";
 import { Redirect } from "react-router-dom";
 import Swal from "sweetalert2";
 import './Form.css'
-import styled from 'styled-components';
 import {Button, PseudoBox} from '@chakra-ui/core'
 import {Box,Heading} from '@chakra-ui/core'
-const ErrorMessage = styled.p`
-color:red;
-`
 
 
 const Signup = (props) => {
@@ -113,7 +109,7 @@ const Signup = (props) => {
         <Box p={5} shadow="lg" borderWidth="2px" rounded="lg" className="form-container">
           <h1 className="heading">Create an account.</h1>
              <div className="auth-links">
-            <ErrorMessage>{error}</ErrorMessage>
+            <div>{error}</div>
              </div>
             <form onSubmit={handleLoginSubmit} className="signup-form">
                 <input

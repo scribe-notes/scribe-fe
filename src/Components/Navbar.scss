@@ -1,0 +1,36 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid lightseagreen;
+  box-shadow: 0 0 8px -2px gray;
+  user-select: none;
+
+  .title {
+    margin: 16px 24px;
+    cursor: pointer;
+  }
+
+  a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    margin: 6px;
+    padding: 10px;
+    border-radius: 7px;
+
+    transition: all 0.1s ease-in-out;
+  }
+
+  a:hover {
+    background-color: rgb(166, 231, 228);
+  }
+
+  .active-item {
+    background-color: lightseagreen;
+    color: white;
+  }
+
+  .active-item:hover {
+    background-color: lightseagreen;
+  }
+}
