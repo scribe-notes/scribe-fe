@@ -73,9 +73,9 @@ const Signup = props => {
               rounded="22px"
               fontSize="14px"
               fontWeight="semibold"
-              bg="#3182ce"
+              bg="#319795"
               // borderColor="#ccd0d5"
-              color="#ffffff"
+              color="white"
               // _hover={{ bg: "#ebedf0" }}
               _active={{
                 bg: "#dddfe2",

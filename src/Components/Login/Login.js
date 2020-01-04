@@ -112,9 +112,9 @@ const Login = (props) => {
                 rounded="22px"
                 fontSize="14px"
                 fontWeight="semibold"
-                bg="rgb(166, 231, 228)"
+                bg="#319795"
                 // borderColor="#ccd0d5"
-                color="black"
+                color="white"
                 // _hover={{ bg: "#ebedf0" }}
                 _active={{
                   bg: "#rgb(166, 231, 228);",
