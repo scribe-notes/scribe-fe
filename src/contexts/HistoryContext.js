@@ -1,5 +1,5 @@
-import React from 'react';
+import {createContext} from 'react';
 
-const HistoryContext = React.createContext([]);
+const HistoryContext = createContext({history: [], setHistory: () => {}});
 
 export default HistoryContext;

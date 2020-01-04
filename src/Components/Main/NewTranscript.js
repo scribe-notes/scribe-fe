@@ -1,23 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useSpeechRecognition, useSpeechSynthesis } from "react-speech-kit";
 import { FaStopCircle, FaCircle } from "react-icons/fa";
 import { AiFillSound } from "react-icons/ai";
-import { Link, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
+import AxiosWithAuth from "./AxiosWithAuth";
+
+import HistoryContext from "../../contexts/HistoryContext";
 
 import "./NewTranscript.scss";
 
-export default function NewTranscript() {
+export default function NewTranscript(props) {
   const [voiceIndex, setVoiceIndex] = useState(null);
   const [next, setNext] = useState(false);
   const [token, setToken] = useState(false);
+  const [recordingLength, setRecordingLength] = useState(0);
+  const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
   const [newValue, setNewValue] = useState("");
   const { speak, voices } = useSpeechSynthesis();
   const voice = voices[voiceIndex] || null;
 
-  useEffect(() => {
+  const { history, setHistory } = useContext(HistoryContext);
+
+  const update = () => {
     setValue(value + " " + newValue);
-  }, [newValue]);
+  }
+
+  useEffect(update, [newValue]);
 
   const { listen, listening, stop } = useSpeechRecognition({
     onResult: result => setNewValue(result)
@@ -28,7 +37,40 @@ export default function NewTranscript() {
   }, []);
 
   const NextHandler = () => {
+    console.log(history);
+    if(listening) StopAndTime();
+    setHistory([
+      ...history,
+      {
+        title: "New Transcript",
+        path: "/new"
+      }
+    ]);
     return setNext(true);
+  };
+
+  const ListenAndTime = () => {
+    setRecordingLength(Date.now());
+
+    listen({ interimResults: false });
+  };
+  const StopAndTime = () => {
+    setRecordingLength(Math.round((Date.now() - recordingLength) / 1000));
+    console.log(recordingLength, "recording");
+    stop();
+  };
+  const HandlePost = e => {
+    e.preventDefault();
+    let obj = { data: value, recordingLength: recordingLength.toString() , title };
+    AxiosWithAuth()
+      .post("https://hackathon-livenotes.herokuapp.com/transcripts", obj)
+      .then(res => {
+        console.log(res);
+        props.history.push('/');
+      })
+      .catch(err => {
+        console.error(err.response);
+      });
   };
 
   if (token === null) {
@@ -55,13 +97,10 @@ export default function NewTranscript() {
               ))}
             </select>
             <div className="buttons">
-              <div
-                className="button"
-                onClick={() => listen({ interimResults: false })}
-              >
+              <div className="button" onClick={ListenAndTime}>
                 <FaCircle />
               </div>
-              <div className="button" onClick={stop}>
+              <div className="button" onClick={StopAndTime}>
                 <FaStopCircle />
               </div>
               <div
@@ -79,20 +118,45 @@ export default function NewTranscript() {
             </div>
           )}
           <div className="right">
-            <div className="button" onClick={() => setNext(true)}>
+            <div className="button" onClick={NextHandler}>
               Next
             </div>
           </div>
         </div>
 
-        <textarea className='text' readOnly value={value} />
+        <textarea className="text" readOnly value={value} />
       </div>
     );
   } else {
     return (
       <div className="new-transcript">
-        <div className="controls"></div>
+        <div className="controls">
+          <div className="left">
+            <h1>Save Transcript</h1>
+            <p>
+              Please Review the fillowing transcript and make corrections as
+              needed.
+            </p>
+            <p>Click Finish when done</p>
+            <p>Or Discard to exit</p>
+          </div>
+          <div className="right">
+            <div className="buttons">
+              <div
+                className="button discard"
+                onClick={() => document.location.reload()}
+              >
+                DISCARD
+              </div>
+              <div className="button" onClick={HandlePost}>
+                FINISH
+              </div>
+            </div>
+          </div>
+        </div>
+        <input className='title' placeholder='Title goes here...' value={title} onChange={e => setTitle(e.target.value)} />
         <textarea
+          className='text'
           value={value}
           onChange={event => setValue(event.target.value)}
         />

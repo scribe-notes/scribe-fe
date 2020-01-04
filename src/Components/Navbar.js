@@ -1,12 +1,15 @@
-import React,{useState,useEffect} from 'react'
+import React,{useState,useEffect, useContext} from 'react'
 import {Link, NavLink} from 'react-router-dom'
+
+import HistoryContext from '../contexts/HistoryContext';
 
 import './Navbar.scss';
 
 export default function Navbar() {
     const [token,setToken] = useState(false);
-     const [loginstate,setLoginstate]=useState()
-        let counter = 0
+
+    const { setHistory } = useContext(HistoryContext);
+
     useEffect(() => {
         setToken(localStorage.getItem("token"))
 
@@ -15,19 +18,19 @@ export default function Navbar() {
 
     return (
         <div className='navbar'>
-            <Link to='/'><h2 className='title'>LiveNotes</h2></Link>
-            <NavLink to ="/new" activeClassName='active-item'>
+            <Link onClick={() => setHistory([])} to='/'><h2 className='title'>LiveNotes</h2></Link>
+            <NavLink onClick={() => setHistory([])} to ="/new" activeClassName='active-item'>
                 New Transcript
             </NavLink>
-            <NavLink exact to="/" activeClassName='active-item'>
+            <NavLink onClick={() => setHistory([])} exact to="/" activeClassName='active-item'>
                 Saved Transcripts
             </NavLink>
             {token === null ? (
-            <NavLink to="/login" activeClassName="active-item">
+            <NavLink onClick={() => setHistory([])} to="/login" activeClassName="active-item">
               login
             </NavLink>
           ) : (
-            <NavLink to="/login" activeClassName="active-item">
+            <NavLink onClick={() => setHistory([])} to="/login" activeClassName="active-item">
               <div
                 className="btn"
                 type="submit"

@@ -4,8 +4,8 @@ import { ThemeProvider } from "@chakra-ui/core";
 import { Route } from "react-router-dom";
 import NewTranscript from "./Components/Main/NewTranscript";
 import SavedTranscripts from "./Components/SavedTranscripts";
-import Settings from "./Components/Settings";
-import Help from "./Components/Help";
+// import Settings from "./Components/Settings";
+// import Help from "./Components/Help";
 import Login from "./Components/Login/Login";
 import Signup from "./Components/Login/Signup";
 import History from './Components/History'
