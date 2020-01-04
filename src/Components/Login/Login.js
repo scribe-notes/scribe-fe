@@ -85,7 +85,7 @@ const Login = (props) => {
                   onChange={handleChange}
                   type='password'
                 />
-                <Button variantColor='blue' width="60%" rounded="20px" onClick={handleLoginSubmit}>
+                <Button variantColor='teal' width="60%" rounded="20px" onClick={handleLoginSubmit}>
                   Login
                 </Button>
             </form>
@@ -112,12 +112,12 @@ const Login = (props) => {
                 rounded="22px"
                 fontSize="14px"
                 fontWeight="semibold"
-                bg="#3182ce"
+                bg="rgb(166, 231, 228)"
                 // borderColor="#ccd0d5"
-                color="#ffffff"
+                color="black"
                 // _hover={{ bg: "#ebedf0" }}
                 _active={{
-                  bg: "#dddfe2",
+                  bg: "#rgb(166, 231, 228);",
                   transform: "scale(0.98)",
                   borderColor: "#bec3c9",
                 }}

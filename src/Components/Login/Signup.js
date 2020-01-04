@@ -122,7 +122,7 @@ const Signup = props => {
               type="password"
             />
             <Button
-              variantColor="blue"
+              variantColor="teal"
               width="60%"
               rounded="20px"
               onClick={handleLoginSubmit}
