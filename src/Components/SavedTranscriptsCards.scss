@@ -24,4 +24,22 @@
   &:hover {
     box-shadow: 0 0 6px -2px gray;
   }
+  .icons{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    color:rgb(31,178,170);
+  
+
+  }
+  .icon{
+    color:rgb(31,178,170);
+    margin:5px;
+    &:hover{
+      
+      transform: skew(15);
+      transition: all 0.5s ease-in-out;
+      color:black;
+    }
+  }
 }

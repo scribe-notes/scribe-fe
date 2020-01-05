@@ -11,6 +11,7 @@ const Signup = props => {
 
   const [input, setInput] = useState({
     username: "",
+    email:"",
     password: ""
   });
 
@@ -27,6 +28,7 @@ const Signup = props => {
       .post("https://hackathon-livenotes.herokuapp.com/users", input)
       .then(res => {
         console.log("login submit results", res);
+
         setError(false);
         // window.localStorage.setItem('token', JSON.stringify(res.data.access_token))
         props.history.push("/login");
@@ -105,6 +107,13 @@ const Signup = props => {
             <div>{error}</div>
           </div>
           <form onSubmit={handleLoginSubmit} className="signup-form">
+          <input
+            className="form-input"
+            placeholder="email"
+            onChange={handleChange}
+            name="email"
+            value={input.email}
+            />
             <input
               className="form-input"
               placeholder="Username"

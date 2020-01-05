@@ -14,6 +14,7 @@ const Login = (props) => {
     const [error,setError] = useState()
   const [input, setInput] = useState({
     username: '',
+    email:'',
     password: ''
   })
 
@@ -71,12 +72,20 @@ const Login = (props) => {
              </div>
             <form onSubmit={handleLoginSubmit} className="login-form">
                 <input
+                className="form-input"
+                placeholder="Email"
+                onChange={handleChange}
+                name="email"
+                value={input.email}
+                />
+                <input
                   className="form-input"
                   placeholder='Username' 
                   onChange={handleChange}
                   name="username"
                   value={input.username}
                 />
+
                 <input
                   className="form-input"
                   placeholder='Password'
@@ -85,6 +94,7 @@ const Login = (props) => {
                   onChange={handleChange}
                   type='password'
                 />
+
                 <Button variantColor='teal' width="60%" rounded="20px" onClick={handleLoginSubmit}>
                   Login
                 </Button>
@@ -113,9 +123,7 @@ const Login = (props) => {
                 fontSize="14px"
                 fontWeight="semibold"
                 bg="#319795"
-                // borderColor="#ccd0d5"
                 color="white"
-                // _hover={{ bg: "#ebedf0" }}
                 _active={{
                   bg: "#rgb(166, 231, 228);",
                   transform: "scale(0.98)",

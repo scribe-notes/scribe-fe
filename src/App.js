@@ -9,6 +9,7 @@ import SavedTranscripts from "./Components/SavedTranscripts";
 import Login from "./Components/Login/Login";
 import Signup from "./Components/Login/Signup";
 import History from './Components/History'
+import ShareTranscripts from "./Components/ShareTranscripts";
 
 function App() {
   return (
@@ -18,8 +19,8 @@ function App() {
         <Route path="/" render={props => <History {...props} />} />
         <Route exact path="/" render={props => <SavedTranscripts {...props} />} />
         <Route exact path="/new" render={props => <NewTranscript {...props} />} />
-        {/* <Route exact path="/settings" render={props => <Settings {...props} />} />
-        <Route exact path="/help" render={props => <Help {...props} />} /> */}
+        <Route exact path = "/share" render = {props => <ShareTranscripts {...props}/>}/>
+
         <Route exact path="/login" render={props => <Login {...props} />} />
         <Route exact path="/signup" render={props => <Signup {...props} />} />
       </div>

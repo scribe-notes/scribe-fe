@@ -1,4 +1,6 @@
 import React from "react";
+import {FaShareSquare,FaRegComments} from 'react-icons/fa'
+import {Link} from 'react-router-dom';
 
 import "./SavedTranscriptsCards.scss";
 
@@ -30,9 +32,18 @@ export default function SavedTranscriptsCards(props) {
 
   return (
     <div className="transcript-card">
-      <h3>{props.title}</h3>
+      <span><h3>{props.title}</h3><h6>{props.data_group}</h6></span>
       <p className='preview' maxLength={180}>{props.data}</p>
-  <p className="length">{hours}:{minutes}:{seconds}</p>
+        <p className="length">{hours}:{minutes}:{seconds}</p>
+        <div className="icons">
+        <Link to="/share"><FaShareSquare className="icon" /></Link>
+
+        <FaRegComments className="icon"/>
+        </div>
+        
+        
+
+
     </div>
   );
 }

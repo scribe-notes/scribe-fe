@@ -13,8 +13,10 @@ export default function NewTranscript(props) {
   const [voiceIndex, setVoiceIndex] = useState(null);
   const [next, setNext] = useState(false);
   const [token, setToken] = useState(false);
+  const [isGroup,setGroup]=useState(false)
   const [recordingLength, setRecordingLength] = useState(0);
   const [title, setTitle] = useState("");
+  const [group,sgroup] = useState(null)
   const [value, setValue] = useState("");
   const [newValue, setNewValue] = useState("");
   const { speak, voices } = useSpeechSynthesis();
@@ -35,7 +37,10 @@ export default function NewTranscript(props) {
   useEffect(() => {
     setToken(localStorage.getItem("token"));
   }, []);
-
+  const GroupHandler = e => {
+    setGroup(true)
+    return sgroup(e.target.value)
+  }
   const NextHandler = () => {
     console.log(history);
     if(listening) StopAndTime();
@@ -61,7 +66,7 @@ export default function NewTranscript(props) {
   };
   const HandlePost = e => {
     e.preventDefault();
-    let obj = { data: value, recordingLength: recordingLength.toString() , title };
+    let obj = { data: value, recordingLength: recordingLength.toString() , title, isGroup};
     AxiosWithAuth()
       .post("https://hackathon-livenotes.herokuapp.com/transcripts", obj)
       .then(res => {
@@ -154,6 +159,7 @@ export default function NewTranscript(props) {
             </div>
           </div>
         </div>
+        <input className="title" placeholder="Type the group name you want to send this to" onChange={GroupHandler}/>
         <input className='title' placeholder='Title goes here...' value={title} onChange={e => setTitle(e.target.value)} />
         <textarea
           className='text'
