@@ -27,33 +27,51 @@ function App() {
   const [history, setHistory] = useState([]);
 
   const [transcript, setTranscript] = useState({
-    isLoading: false,
-    error: ""
+    isGetting: false,
+    isPosting: false,
+    error: "",
+    transcripts: []
   });
 
   const setTranscriptError = error => {
     setTranscript({
       ...transcript,
       error: error,
-      isLoading: false
+      isPosting: false,
+      isGetting: false
     });
   };
 
-  const setTranscriptLoading = loading => {
+  const setTranscriptPosting = posting => {
     setTranscript({
       ...transcript,
       error: "",
-      isLoading: loading
+      isPosting: posting
     });
   };
+  
+  const setTranscriptGetting = getting => {
+    setTranscript({
+      ...transcript,
+      error: "",
+      isGetting: getting
+    })
+  }
+
+  const setTranscripts = transcripts => {
+    setTranscript({
+      ...transcript,
+      isGetting: false,
+      transcripts
+    })
+  }
 
   const postTranscript = transcript => {
-    setTranscriptLoading(true);
-    console.log(transcript);
+    setTranscriptPosting(true);
     return AxiosWithAuth()
       .post(`${process.env.REACT_APP_BACKEND}/transcripts`, transcript)
       .then(res => {
-        setTranscriptLoading(false);
+        setTranscriptPosting(false);
         return AxiosWithAuth().get(`${process.env.REACT_APP_BACKEND}/transcripts/mine`);
       })
       .catch(err => {
@@ -62,6 +80,20 @@ function App() {
         return err.response.data.message;
       });
   };
+
+  const getMyTranscripts = () => {
+    setTranscriptGetting(true);
+    return AxiosWithAuth()
+    .get(`${process.env.REACT_APP_BACKEND}/transcripts/mine`)
+    .then(res => {
+      setTranscripts(res.data);
+    })
+    .catch(err => {
+      console.log(err);
+      setTranscriptError(err.response.data.message);
+      return err.respone.data.message;
+    });
+  }
 
   const setUserError = error => {
     setUser({
@@ -162,7 +194,7 @@ function App() {
 
   return (
     <TranscriptContext.Provider
-      value={{ transcript, setTranscript, postTranscript }}
+      value={{ transcript, setTranscript, postTranscript, getMyTranscripts, setTranscripts }}
     >
       <HistoryContext.Provider value={{ history, setHistory }}>
         <UserContext.Provider value={{ user, setUser, logout, login, signup }}>

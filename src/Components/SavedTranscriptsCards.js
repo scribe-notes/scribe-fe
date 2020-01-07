@@ -4,7 +4,7 @@ import TranscriptContext from "../contexts/TranscriptContext";
 
 import { Spinner } from "@chakra-ui/core";
 
-import options from '../img/options.png';
+import options from "../img/options.png";
 
 import "./SavedTranscriptsCards.scss";
 
@@ -13,11 +13,11 @@ export default function SavedTranscriptsCards(props) {
   // this where the ref for the input will live
   const titleSetter = useRef(null);
 
-  const { transcript } = useContext(TranscriptContext);
+  const { transcript, editTranscript } = useContext(TranscriptContext);
 
   // If this is being rendered to create a folder,
   // this is where our field's data would live
-  const [newTitle, setNewTitle] = useState("New Folder");
+  const [newTitle, setNewTitle] = useState(props.title ? props.title : "New Folder");
 
   // Handle submitting a new folder
   const handleSubmit = e => {
@@ -60,13 +60,22 @@ export default function SavedTranscriptsCards(props) {
     seconds = `0${seconds}`;
   }
 
+  const handleEdit = () => {
+    editTranscript(newTitle).then(err => {
+      if(!err) {
+        setShowOptions(false);
+      }
+    });
+  }
+
   return (
-    <div className={`transcript-card ${props.newFolder && 'creating'}`}>
+    <div className={`transcript-card ${props.newFolder && "creating"} ${showOptions && "editing"}`}>
       <div className="title">
         {props.newFolder ? (
           <form onSubmit={handleSubmit}>
-            <h3 className='create'>Create Folder</h3>
+            <h3 className="create">Create Folder</h3>
             <input
+              autoComplete="off"
               ref={titleSetter}
               onBlur={props.cancelFolder}
               id="newTitle"
@@ -76,29 +85,46 @@ export default function SavedTranscriptsCards(props) {
           </form>
         ) : (
           <>
-            <h3>{props.title}</h3>
-            <div className="options">
-              <img className='icon' src={options} alt='' />
+            <h3>{showOptions ? `Edit '${props.title}'` : props.title}</h3>
+            <div className="options-toggle">
+              <img onClick={() => setShowOptions(!showOptions)} className="icon" src={options} alt="" />
             </div>
           </>
         )}
       </div>
-      <div className="preview" maxLength={180}>
-        {props.newFolder ? (
-          transcript.isLoading ? (
-            <Spinner />
-          ) : (
-            ""
-          )
-        ) : (
-          <p>{props.data}</p>
-        )}
-      </div>
-      <p className="length">
-        {!props.isGroup && !props.newFolder
-          ? `${hours}:${minutes}:${seconds}`
-          : `Folder`}
-      </p>
+      {showOptions ? (
+        <form onSubmit={handleEdit} className="options">
+          <label>Rename {props.isGroup ? 'folder' : 'transcript'}</label>
+          <input id="newTitle" value={newTitle} onChange={e => setNewTitle(e.target.value)} />
+          <div className='buttons'>
+            <div className='share'>
+              Share...
+            </div>
+            <div className='delete'>
+              Delete
+            </div>
+          </div>
+        </form>
+      ) : (
+        <>
+          <div className="preview" maxLength={180}>
+            {props.newFolder ? (
+              transcript.isPosting ? (
+                <Spinner />
+              ) : (
+                ""
+              )
+            ) : (
+              <p>{props.data}</p>
+            )}
+          </div>
+          <p className="length">
+            {!props.isGroup && !props.newFolder
+              ? `${hours}:${minutes}:${seconds}`
+              : `Folder`}
+          </p>
+        </>
+      )}
     </div>
   );
 }

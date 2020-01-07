@@ -1,6 +1,7 @@
 .transcript-card {
   border: 1px solid gray;
   width: 256px;
+  height: 164px;
   border-radius: 12px;
   padding: 8px;
   margin: 8px;
@@ -18,6 +19,11 @@
     border-style: dashed;
   }
 
+  &.editing {
+    background-color: teal;
+    color: white;
+  }
+
   .title {
     display: flex;
     align-items: center;
@@ -27,7 +33,7 @@
       color: lightseagreen;
     }
 
-    .options {
+    .options-toggle {
       width: 32px;
       
       img {
@@ -44,6 +50,7 @@
 
   h3 {
     width: 100%;
+    margin: 0.5em 0;
   }
 
   #newTitle {
@@ -55,7 +62,7 @@
     padding: 5px;
     font-size: 16px;
     font-weight: bold;
-    margin: 1em 0;
+    margin: 0.5em 0;
     box-sizing: border-box;
 
     transition: all 0.1s ease-in-out;
@@ -63,6 +70,43 @@
     &:focus {
       outline: none;
       border: 2px solid lightseagreen;
+    }
+  }
+
+  .options {
+    height: 100%;
+
+    .buttons {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      
+      .delete, .share {
+        width: 49%;
+        padding: 8px;
+        margin: 4px;
+        text-align: center;
+        font-weight: bold;
+        border-radius: 7px;
+
+        transition: all 0.1s ease-in-out;
+      }
+
+      .share {
+        background-color: lightseagreen;
+
+        &:hover {
+          background-color: rgb(101, 223, 217);
+        }
+      }
+
+      .delete {
+        background-color: crimson;
+
+        &:hover {
+          background-color: red;
+        }
+      }
     }
   }
 
