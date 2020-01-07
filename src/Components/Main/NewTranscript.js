@@ -2,8 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useSpeechRecognition, useSpeechSynthesis } from "react-speech-kit";
 import { FaStopCircle, FaCircle } from "react-icons/fa";
 import { AiFillSound } from "react-icons/ai";
-import { Redirect } from "react-router-dom";
-import AxiosWithAuth from "./AxiosWithAuth";
+import AxiosWithAuth from "../../util/AxiosWithAuth";
 
 import HistoryContext from "../../contexts/HistoryContext";
 
@@ -12,7 +11,6 @@ import "./NewTranscript.scss";
 export default function NewTranscript(props) {
   const [voiceIndex, setVoiceIndex] = useState(null);
   const [next, setNext] = useState(false);
-  const [token, setToken] = useState(false);
   const [recordingLength, setRecordingLength] = useState(0);
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
@@ -31,10 +29,6 @@ export default function NewTranscript(props) {
   const { listen, listening, stop } = useSpeechRecognition({
     onResult: result => setNewValue(result)
   });
-
-  useEffect(() => {
-    setToken(localStorage.getItem("token"));
-  }, []);
 
   const NextHandler = () => {
     console.log(history);
@@ -73,9 +67,7 @@ export default function NewTranscript(props) {
       });
   };
 
-  if (token === null) {
-    return <Redirect to="/login" />;
-  } else if (!next) {
+  if (!next) {
     return (
       <div className="new-transcript">
         <div className="controls">

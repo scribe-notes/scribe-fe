@@ -3,14 +3,18 @@
   align-items: center;
   border-bottom: 1px solid lightseagreen;
   box-shadow: 0 0 8px -2px gray;
+  background-color: white;
   user-select: none;
+  height: 9.9vh;
+  z-index: 1;
 
   .title {
     margin: 16px 24px;
     cursor: pointer;
   }
 
-  a {
+  a, .btn {
+    cursor: pointer;
     text-decoration: none;
     color: black;
     font-weight: bold;
@@ -19,10 +23,10 @@
     border-radius: 7px;
 
     transition: all 0.1s ease-in-out;
-  }
-
-  a:hover {
-    background-color: rgb(166, 231, 228);
+  
+    &:hover {
+      background-color: rgb(166, 231, 228);
+    }
   }
 
   .active-item {
