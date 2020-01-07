@@ -2,9 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import { useSpeechRecognition, useSpeechSynthesis } from "react-speech-kit";
 import { FaStopCircle, FaCircle } from "react-icons/fa";
 import { AiFillSound } from "react-icons/ai";
-import AxiosWithAuth from "../../util/AxiosWithAuth";
-import queryString from 'query-string';
+import queryString from "query-string";
 
+import TranscriptContext from "../../contexts/TranscriptContext";
 import HistoryContext from "../../contexts/HistoryContext";
 
 import "./NewTranscript.scss";
@@ -20,31 +20,32 @@ export default function NewTranscript(props) {
   const voice = voices[voiceIndex] || null;
 
   const { history, setHistory } = useContext(HistoryContext);
+  const { postTranscript } = useContext(TranscriptContext);
 
   const update = () => {
     setValue(value + " " + newValue);
-  }
+  };
 
   useEffect(update, [newValue]);
 
   useEffect(() => {
     const values = queryString.parse(props.location.search);
 
-    if(values.step) {
-        if(values.step === "1") {
-            setNext(false);
-        } else {
-            setNext(true);
-        }
+    if (values.step) {
+      if (values.step === "1") {
+        setNext(false);
+      } else {
+        setNext(true);
+      }
     }
-  }, [props.location.search])
+  }, [props.location.search]);
 
   const { listen, listening, stop } = useSpeechRecognition({
     onResult: result => setNewValue(result)
   });
 
   const NextHandler = () => {
-    if(listening) StopAndTime();
+    if (listening) StopAndTime();
     setHistory([
       ...history,
       {
@@ -52,7 +53,7 @@ export default function NewTranscript(props) {
         path: "/new?step=1"
       }
     ]);
-    props.history.push('/new?step=2');
+    props.history.push("/new?step=2");
     return setNext(true);
   };
 
@@ -68,21 +69,23 @@ export default function NewTranscript(props) {
   };
 
   const handleDiscard = () => {
-      props.history.push('/new');
-      window.location.reload();
-  }
+    props.history.push("/new");
+    window.location.reload();
+  };
 
   const HandlePost = e => {
     e.preventDefault();
-    let obj = { data: value, recordingLength: recordingLength.toString() , title };
-    AxiosWithAuth()
-      .post(`${process.env.REACT_APP_BACKEND}/transcripts`, obj)
-      .then(res => {
-        props.history.push('/');
-      })
-      .catch(err => {
-        console.error(err.response);
-      });
+    let obj = {
+      data: value,
+      recordingLength: recordingLength.toString(),
+      title
+    };
+
+    postTranscript(obj).then(err => {
+      if (!err) {
+        props.history.push("/");
+      }
+    });
   };
 
   if (!next) {
@@ -152,10 +155,7 @@ export default function NewTranscript(props) {
           </div>
           <div className="right">
             <div className="buttons">
-              <div
-                className="button discard"
-                onClick={handleDiscard}
-              >
+              <div className="button discard" onClick={handleDiscard}>
                 DISCARD
               </div>
               <div className="button" onClick={HandlePost}>
@@ -164,9 +164,14 @@ export default function NewTranscript(props) {
             </div>
           </div>
         </div>
-        <input className='title' placeholder='Title goes here...' value={title} onChange={e => setTitle(e.target.value)} />
+        <input
+          className="title"
+          placeholder="Title goes here..."
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+        />
         <textarea
-          className='text'
+          className="text"
           value={value}
           onChange={event => setValue(event.target.value)}
         />

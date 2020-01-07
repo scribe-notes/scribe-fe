@@ -6,5 +6,46 @@
   .list {
     display: flex;
     flex-flow: row wrap;
+    
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+
+      user-select: none;
+
+      .left {
+        .filter {
+          display: flex;
+          align-items: center;
+        }
+      }
+
+      .right {
+        display: flex;
+
+        .btn {
+          background-color: teal;
+          color: white;
+          padding: 8px;
+          font-weight: bold;
+          border-radius: 7px;
+          margin: 4px;
+          cursor: pointer;
+
+          transition: all 0.1s ease-in-out;
+
+          &:hover {
+            background-color: rgb(62, 173, 173);
+          }
+        }
+      }
+    }
+
+    .empty {
+      width: 100%;
+      text-align: center;
+      padding: 16px;
+    }
   }
 }

@@ -13,6 +13,59 @@
 
   transition: all 0.1s ease-in-out;
 
+  &.creating {
+    border-color: lightseagreen;
+    border-style: dashed;
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .create {
+      color: lightseagreen;
+    }
+
+    .options {
+      width: 32px;
+      
+      img {
+        width: 100%;
+
+        transition: all 0.2s ease-in-out;
+
+        &:hover {
+          transform: rotate(45deg);
+        }
+      }
+    }
+  }
+
+  h3 {
+    width: 100%;
+  }
+
+  #newTitle {
+    width: 100%;
+    display: flex;
+    flex-shrink: 500;
+    border-radius: 7px;
+    border: 2px solid gray;
+    padding: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 1em 0;
+    box-sizing: border-box;
+
+    transition: all 0.1s ease-in-out;
+
+    &:focus {
+      outline: none;
+      border: 2px solid lightseagreen;
+    }
+  }
+
   .length {
     color: gray;
   }
