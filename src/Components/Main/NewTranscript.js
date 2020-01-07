@@ -3,6 +3,7 @@ import { useSpeechRecognition, useSpeechSynthesis } from "react-speech-kit";
 import { FaStopCircle, FaCircle } from "react-icons/fa";
 import { AiFillSound } from "react-icons/ai";
 import AxiosWithAuth from "../../util/AxiosWithAuth";
+import queryString from 'query-string';
 
 import HistoryContext from "../../contexts/HistoryContext";
 
@@ -26,20 +27,32 @@ export default function NewTranscript(props) {
 
   useEffect(update, [newValue]);
 
+  useEffect(() => {
+    const values = queryString.parse(props.location.search);
+
+    if(values.step) {
+        if(values.step === "1") {
+            setNext(false);
+        } else {
+            setNext(true);
+        }
+    }
+  }, [props.location.search])
+
   const { listen, listening, stop } = useSpeechRecognition({
     onResult: result => setNewValue(result)
   });
 
   const NextHandler = () => {
-    console.log(history);
     if(listening) StopAndTime();
     setHistory([
       ...history,
       {
         title: "New Transcript",
-        path: "/new"
+        path: "/new?step=1"
       }
     ]);
+    props.history.push('/new?step=2');
     return setNext(true);
   };
 
@@ -48,18 +61,23 @@ export default function NewTranscript(props) {
 
     listen({ interimResults: false });
   };
+
   const StopAndTime = () => {
     setRecordingLength(Math.round((Date.now() - recordingLength) / 1000));
-    console.log(recordingLength, "recording");
     stop();
   };
+
+  const handleDiscard = () => {
+      props.history.push('/new');
+      window.location.reload();
+  }
+
   const HandlePost = e => {
     e.preventDefault();
     let obj = { data: value, recordingLength: recordingLength.toString() , title };
     AxiosWithAuth()
-      .post("https://hackathon-livenotes.herokuapp.com/transcripts", obj)
+      .post(`${process.env.REACT_APP_BACKEND}/transcripts`, obj)
       .then(res => {
-        console.log(res);
         props.history.push('/');
       })
       .catch(err => {
@@ -136,7 +154,7 @@ export default function NewTranscript(props) {
             <div className="buttons">
               <div
                 className="button discard"
-                onClick={() => document.location.reload()}
+                onClick={handleDiscard}
               >
                 DISCARD
               </div>

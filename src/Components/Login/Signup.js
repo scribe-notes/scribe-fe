@@ -6,7 +6,7 @@ import "./Form.scss";
 import { Button, PseudoBox } from "@chakra-ui/core";
 import { Box, Heading } from "@chakra-ui/core";
 
-const Signup = props => {
+const Signup = () => {
   const [error, setError] = useState(null);
 
   const [input, setInput] = useState({
@@ -19,6 +19,7 @@ const Signup = props => {
   const userContext = useContext(UserContext);
 
   const handleChange = e => {
+    setError('');
     setInput({
       ...input,
       [e.target.name]: e.target.value
@@ -32,8 +33,8 @@ const Signup = props => {
       return setError("Passwords do not match!");
 
     userContext.signup(input)
-    .then(() => {
-      if (!userContext.error) {
+    .then(err => {
+      if (!err) {
         Swal.fire({
           position: "center",
           icon: "success",
@@ -41,7 +42,7 @@ const Signup = props => {
           showConfirmButton: false,
           timer: 1500
         });
-      }
+      } else setError(err);
     });
   };
 
@@ -159,7 +160,7 @@ const Signup = props => {
               Sign up
             </Button>
             <div className="error">
-              {error ? error : userContext.user.error}
+              {error}
             </div>
           </form>
         </Box>

@@ -13,6 +13,7 @@
     "dotenv": "^8.2.0",
     "emotion-theming": "^10.0.27",
     "node-sass": "^4.13.0",
+    "query-string": "^6.9.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-icons": "^3.8.0",

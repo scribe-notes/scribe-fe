@@ -7,7 +7,9 @@ import { Box, Heading } from "@chakra-ui/core";
 import UserContext from "../../contexts/UserContext";
 import "./LoginForm.scss";
 
-const Login = props => {
+const Login = () => {
+  const [error, setError] = useState('');
+
   const [input, setInput] = useState({
     username: "",
     password: ""
@@ -16,6 +18,7 @@ const Login = props => {
   const userContext = useContext(UserContext);
 
   const handleChange = e => {
+    setError('');
     setInput({
       ...input,
       [e.target.name]: e.target.value
@@ -26,8 +29,8 @@ const Login = props => {
     e.preventDefault();
 
     userContext.login(input)
-    .then(() => {
-      if (!userContext.error) {
+    .then(err => {
+      if (!err) {
         Swal.fire({
           position: "center",
           icon: "success",
@@ -35,7 +38,7 @@ const Login = props => {
           showConfirmButton: false,
           timer: 1500
         });
-      }
+      } else setError(err);
     });
   };
 
@@ -81,7 +84,7 @@ const Login = props => {
               Login
             </Button>
           </form>
-          <div className="error">{userContext.error}</div>
+          <div className="error">{error}</div>
         </Box>
       </div>
       <div className="right">

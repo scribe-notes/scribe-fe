@@ -9,8 +9,9 @@ export default function SavedTranscripts() {
   const [data, setData] = useState();
   useEffect(() => {
     AxiosWithAuth()
-      .get("https://hackathon-livenotes.herokuapp.com/transcripts/mine")
+      .get(`${process.env.REACT_APP_BACKEND}/transcripts/mine`)
       .then(res => {
+          console.log(res.data);
         setData(res.data);
       })
       .catch(err => {
