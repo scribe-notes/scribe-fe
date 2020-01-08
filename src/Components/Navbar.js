@@ -11,10 +11,11 @@ import "./Navbar.scss";
 export default function Navbar() {
 
   const { setHistory } = useContext(HistoryContext);
-  const userContext = useContext(UserContext);
+  const { user, logout } = useContext(UserContext);
 
   return (
     <div className="navbar">
+      <div className='left'>
       <Link onClick={() => setHistory([])} to="/transcripts">
         <h2 className="title">scribe</h2>
       </Link>
@@ -25,7 +26,7 @@ export default function Navbar() {
       >
         My Transcripts
       </NavLink>
-      {userContext.user.isLoading ? <Spinner /> : userContext.user.data === null ? (
+      {user.isLoading ? <Spinner /> : user.data === null ? (
         <Link
           onClick={() => setHistory([])}
           to="/login"
@@ -39,12 +40,16 @@ export default function Navbar() {
             onClick={() => {
               setHistory([]);
               localStorage.removeItem("token");
-              userContext.logout();
+              logout();
             }}
           >
             Logout
           </div>
       )}
+      </div>
+      <div className='right'>
+          <div className='username'>Signed in as <strong>{user.data?.username}</strong></div>
+      </div>
     </div>
   );
 }

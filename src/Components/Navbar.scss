@@ -1,42 +1,54 @@
 .navbar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   border-bottom: 1px solid lightseagreen;
   box-shadow: 0 0 8px -2px gray;
   background-color: white;
   user-select: none;
   height: 9.9vh;
   z-index: 1;
+  .left {
+    display: flex;
+    align-items: center;
 
-  .title {
-    margin: 16px 24px;
-    font-size: 32px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    cursor: pointer;
-  }
+    .title {
+      margin: 16px 24px;
+      font-size: 32px;
+      font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+      cursor: pointer;
+    }
 
-  a, .btn {
-    cursor: pointer;
-    text-decoration: none;
-    color: black;
-    font-weight: bold;
-    margin: 6px;
-    padding: 10px;
-    border-radius: 7px;
+    a,
+    .btn {
+      cursor: pointer;
+      text-decoration: none;
+      color: black;
+      font-weight: bold;
+      margin: 6px;
+      padding: 10px;
+      border-radius: 7px;
 
-    transition: all 0.1s ease-in-out;
-  
-    &:hover {
-      background-color: rgb(166, 231, 228);
+      transition: all 0.1s ease-in-out;
+
+      &:hover {
+        background-color: rgb(166, 231, 228);
+      }
+    }
+
+    .active-item {
+      background-color: lightseagreen;
+      color: white;
+    }
+
+    .active-item:hover {
+      background-color: lightseagreen;
     }
   }
 
-  .active-item {
-    background-color: lightseagreen;
-    color: white;
-  }
-
-  .active-item:hover {
-    background-color: lightseagreen;
+  .right {
+    .username {
+      margin: 20px 24px;
+    }
   }
 }

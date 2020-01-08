@@ -38,11 +38,16 @@ export default function SavedTranscripts(props) {
   const validateHistory = useCallback(() => {
     // Here, we ensure that we have a history item to take us up a level
     // if we first load into a directory
+
+    // TODO: Check to make sure we have access to the parent directory
+    // before doing this
+
     if (id && history.length === 0 && transcript.currentTranscript._id === id) {
       let title = "Saved Transcripts";
       let path = "/transcripts";
       console.log("creating history...");
       if (transcript.currentTranscript.parent) {
+        //TODO: Get the correct title of parent directory
         title = transcript.currentTranscript.parent.title;
         path = `/transcripts/${transcript.currentTranscript.parent}`;
       }
