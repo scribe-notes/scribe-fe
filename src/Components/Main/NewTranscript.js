@@ -22,8 +22,6 @@ export default function NewTranscript(props) {
   const { history, setHistory } = useContext(HistoryContext);
   const { postTranscript } = useContext(TranscriptContext);
 
-  console.log(value);
-
   const update = () => {
     setValue(value + " " + newValue);
   };
@@ -154,7 +152,7 @@ export default function NewTranscript(props) {
               needed.
             </p>
             <p>Click Finish when done</p>
-            <p>Or Discard to exit</p>
+            <p>Or Discard to cancel</p>
           </div>
           <div className="right">
             <div className="buttons">

@@ -19,9 +19,9 @@ export default function TranscriptCard(props) {
     TranscriptContext
   );
 
-  // If this is being rendered to create a folder,
+  // If this is being rendered to create a folder
+  // or to edit something's title,
   // this is where our field's data would live
-  console.log(props.title);
   const [newTitle, setNewTitle] = useState(
     props.title ? props.title : "New Folder"
   );
