@@ -58,7 +58,6 @@ export default function SavedTranscripts(props) {
   useEffect(() => {
     if (transcript.currentTranscript) {
       setPageTitle(transcript.currentTranscript.title);
-      console.log(transcript.currentTranscript);
       validateHistory();
     } else if (!id) setPageTitle("Saved Transcripts");
   }, [transcript.currentTranscript, id, validateHistory]);
