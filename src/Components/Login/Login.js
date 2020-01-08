@@ -29,7 +29,7 @@ const Login = () => {
     e.preventDefault();
 
     login(input)
-    .finally(err => {
+    .then(err => {
       if (!err) {
         Swal.fire({
           position: "center",

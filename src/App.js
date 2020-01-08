@@ -226,9 +226,9 @@ function App() {
         assignUserData(res.data);
       })
       .catch(err => {
-        console.error(err);
-        setUserError(err.response.data.message);
-        return err.response.data.message;
+        console.error(err.response);
+        setUserError(err.response?.data?.message);
+        return err.response?.data?.message;
       });
   };
 
