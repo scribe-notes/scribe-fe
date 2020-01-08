@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useContext } from "react";
 
+import HistoryContext from '../contexts/HistoryContext';
 import TranscriptContext from "../contexts/TranscriptContext";
 
 import { Spinner } from "@chakra-ui/core";
@@ -14,6 +15,8 @@ export default function TranscriptCard(props) {
   const titleSetter = useRef(null);
   
   const thisCard = useRef(null);
+
+  const {history, setHistory} = useContext(HistoryContext);
 
   const { transcript, deleteTranscript, updateTranscript } = useContext(
     TranscriptContext
@@ -98,8 +101,19 @@ export default function TranscriptCard(props) {
     };
   });
 
+  const open = () => {
+    setHistory([
+      ...history,
+      {
+        title: props.pageTitle,
+        path: window.location.pathname
+      }]);
+    props.history.push(`/transcripts/${props._id}`)
+  }
+
   return (
     <div ref={thisCard}
+         onClick={open}
       className={`transcript-card ${props.newFolder &&
         "creating"} ${showOptions && "editing"} ${transcript.isUpdating &&
         "updating"}`}

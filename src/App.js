@@ -6,6 +6,7 @@ import { Route } from "react-router-dom";
 import ProtectedRoute from "./Components/_util/ProtectedRoute";
 import NewTranscript from "./Components/Main/NewTranscript";
 import SavedTranscripts from "./Components/SavedTranscripts";
+import Landing from "./Components/Landing";
 // import Settings from "./Components/Settings";
 // import Help from "./Components/Help";
 import Login from "./Components/Login/Login";
@@ -31,6 +32,7 @@ function App() {
     isPosting: false,
     isUpdating: false,
     error: "",
+    currentTranscript: "",
     transcripts: []
   });
 
@@ -73,8 +75,35 @@ function App() {
       isGetting: false,
       isPosting: false,
       isUpdating: false,
+      currentTranscript: null,
       transcripts
     });
+  };
+
+  const setCurrentTranscript = transcript => {
+    setTranscript({
+      ...transcript,
+      isGetting: false,
+      isPosting: false,
+      isUpdating: false,
+      currentTranscript: transcript,
+      transcripts: transcript.children
+    })
+  }
+
+  const getTranscript = transcriptId => {
+    setTranscriptGetting(true);
+    return AxiosWithAuth()
+      .get(`${process.env.REACT_APP_BACKEND}/transcripts/${transcriptId}`)
+      .then(res => {
+        setCurrentTranscript(res.data);
+        console.log(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+        setTranscriptError(err.response.data.message);
+        return err.respone.data.message;
+      });
   };
 
   const postTranscript = transcript => {
@@ -100,7 +129,10 @@ function App() {
   const updateTranscript = transcript => {
     setTranscriptUpdating(true);
     return AxiosWithAuth()
-      .put(`${process.env.REACT_APP_BACKEND}/transcripts/${transcript._id}`, transcript)
+      .put(
+        `${process.env.REACT_APP_BACKEND}/transcripts/${transcript._id}`,
+        transcript
+      )
       .then(res => {
         return AxiosWithAuth().get(
           `${process.env.REACT_APP_BACKEND}/transcripts/mine`
@@ -253,7 +285,8 @@ function App() {
         getMyTranscripts,
         setTranscripts,
         deleteTranscript,
-        updateTranscript
+        updateTranscript,
+        getTranscript
       }}
     >
       <HistoryContext.Provider value={{ history, setHistory }}>
@@ -261,9 +294,18 @@ function App() {
           <ThemeProvider>
             <div className="app">
               <Navbar />
+              <Route exact path="/" render={props => <Landing {...props} />} />
               <Route path="/" render={props => <History {...props} />} />
-              <ProtectedRoute exact path="/" component={SavedTranscripts} />
-              <ProtectedRoute exact path="/transcripts/:id" component={SavedTranscripts} />
+              <ProtectedRoute
+                exact
+                path="/transcripts"
+                component={SavedTranscripts}
+              />
+              <ProtectedRoute
+                exact
+                path="/transcripts/:id"
+                component={SavedTranscripts}
+              />
               <ProtectedRoute exact path="/new" component={NewTranscript} />
               {/* <Route exact path="/settings" render={props => <Settings {...props} />} />
         <Route exact path="/help" render={props => <Help {...props} />} /> */}

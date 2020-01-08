@@ -14,7 +14,9 @@ export default function SavedTranscripts(props) {
   const FILTER_OPTIONS = ["all", "mine", "shared"];
 
   // Id of a specific transcript/folder
-  // const {id} = props.match.params;
+  const { id } = props.match.params;
+
+  const [pageTitle, setPageTitle] = useState("Saved Transcripts");
 
   const [filterBy, setFilterBy] = useState(FILTER_OPTIONS[0]);
 
@@ -23,18 +25,29 @@ export default function SavedTranscripts(props) {
     postTranscript,
     getMyTranscripts,
     transcript,
-    setTranscript
+    setTranscript,
+    getTranscript
   } = useContext(TranscriptContext);
+
+  useEffect(() => {
+    if(transcript.currentTranscript)
+      setPageTitle(transcript.currentTranscript.title)
+    else if(!id) setPageTitle("Saved Transcripts");
+  }, [transcript.currentTranscript, id])
+
+  const getContents = () => {
+    if (id) {
+      getTranscript(id).then(err => {
+        // Handle an error
+      });
+    } else getMyTranscripts();
+  };
+
+  useEffect(getContents, [id]);
 
   const onChangeFilterBy = option => {
     setFilterBy(option);
   };
-
-  const init = () => {
-      getMyTranscripts();
-  }
-
-  useEffect(init, []);
 
   const createFolder = () => {
     setTranscript({
@@ -54,8 +67,8 @@ export default function SavedTranscripts(props) {
       return t._id !== "newFolder";
     });
     setTranscript({
-        ...transcript,
-        transcripts
+      ...transcript,
+      transcripts
     });
   };
 
@@ -67,7 +80,7 @@ export default function SavedTranscripts(props) {
 
   return (
     <div className="saved-transcripts">
-      <h2>Saved Transcripts</h2>
+      <h2>{pageTitle}</h2>
       <div className="list">
         <div className="toolbar">
           <div className="left">
@@ -113,6 +126,8 @@ export default function SavedTranscripts(props) {
               if (!transcript.createdAt) newFolder = true;
               return (
                 <TranscriptCard
+                  pageTitle={pageTitle}
+                  history={props.history}
                   submitFolder={submitFolder}
                   cancelFolder={cancelFolder}
                   newFolder={newFolder}

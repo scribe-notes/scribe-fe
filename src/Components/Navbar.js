@@ -15,13 +15,12 @@ export default function Navbar() {
 
   return (
     <div className="navbar">
-      <Link onClick={() => setHistory([])} to="/">
+      <Link onClick={() => setHistory([])} to="/transcripts">
         <h2 className="title">scribe</h2>
       </Link>
       <NavLink
         onClick={() => setHistory([])}
-        exact
-        to="/"
+        to="/transcripts"
         activeClassName="active-item"
       >
         My Transcripts
