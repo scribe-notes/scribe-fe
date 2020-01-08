@@ -16,22 +16,22 @@ export default function Navbar() {
   return (
     <div className="navbar">
       <Link onClick={() => setHistory([])} to="/">
-        <h2 className="title">LiveNotes</h2>
+        <h2 className="title">scribe</h2>
       </Link>
-      <NavLink
-        onClick={() => setHistory([])}
-        to="/new"
-        activeClassName="active-item"
-      >
-        New Transcript
-      </NavLink>
       <NavLink
         onClick={() => setHistory([])}
         exact
         to="/"
         activeClassName="active-item"
       >
-        Saved Transcripts
+        My Transcripts
+      </NavLink>
+      <NavLink
+        onClick={() => setHistory([])}
+        to="/new"
+        activeClassName="active-item"
+      >
+        New Transcript
       </NavLink>
       {userContext.user.isLoading ? <Spinner /> : userContext.user.data === null ? (
         <Link

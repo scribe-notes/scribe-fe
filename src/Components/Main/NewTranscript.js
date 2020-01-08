@@ -22,6 +22,8 @@ export default function NewTranscript(props) {
   const { history, setHistory } = useContext(HistoryContext);
   const { postTranscript } = useContext(TranscriptContext);
 
+  console.log(value);
+
   const update = () => {
     setValue(value + " " + newValue);
   };
@@ -82,6 +84,7 @@ export default function NewTranscript(props) {
     };
 
     postTranscript(obj).then(err => {
+      console.log(err);
       if (!err) {
         props.history.push("/");
       }
@@ -131,7 +134,7 @@ export default function NewTranscript(props) {
             </div>
           )}
           <div className="right">
-            <div className="button" onClick={NextHandler}>
+            <div className={`button ${value.trim() === '' && 'disabled'}`} onClick={NextHandler}>
               Next
             </div>
           </div>

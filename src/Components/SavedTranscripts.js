@@ -61,9 +61,7 @@ export default function SavedTranscripts(props) {
   const submitFolder = title => {
     const transcript = { title, isGroup: true };
 
-    postTranscript(transcript).then(res => {
-      setTranscripts(res.data);
-    });
+    postTranscript(transcript);
   };
 
   return (

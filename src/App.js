@@ -74,6 +74,9 @@ function App() {
         setTranscriptPosting(false);
         return AxiosWithAuth().get(`${process.env.REACT_APP_BACKEND}/transcripts/mine`);
       })
+      .then(res => {
+        setTranscripts(res.data);
+      })
       .catch(err => {
         console.error(err.response);
         setTranscriptError(err.response.data.message);

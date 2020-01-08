@@ -29,6 +29,15 @@
     align-items: center;
     justify-content: space-between;
 
+    h3 {
+      display: block;
+      white-space: nowrap;
+      height: 25px;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .create {
       color: lightseagreen;
     }
@@ -80,7 +89,7 @@
       display: flex;
       width: 100%;
       justify-content: space-between;
-      
+
       .delete, .share {
         width: 49%;
         padding: 8px;
