@@ -21,11 +21,22 @@ export default function NewTranscript(props) {
   const voice = voices[voiceIndex] || null;
 
   const { history, setHistory } = useContext(HistoryContext);
-  const { postTranscript, transcript } = useContext(TranscriptContext);
+  const { postTranscript, transcript, getTranscript } = useContext(TranscriptContext);
+
+  // Id of a parent, if any
+  const { id } = props.match.params;
 
   const update = () => {
     setValue(value + " " + newValue);
   };
+
+  const init = () => {
+    // If we have an id but no data for it, get it
+    if(!transcript.currentTranscript && id)
+      getTranscript(id);
+  }
+
+  useEffect(init, [id]);
 
   useEffect(update, [newValue]);
 
@@ -51,14 +62,27 @@ export default function NewTranscript(props) {
 
   const NextHandler = () => {
     if (listening) StopAndTime();
+    // Get the current pathname
+    let currentPath = window.location.pathname;
+
+    // If there is a residual query string, remove it
+    const end = currentPath.indexOf("?step=");
+    if (end !== -1) currentPath = currentPath.slice(0, end);
+
+    // Define where to go from here
+    const newPath = `${currentPath}?step=2`;
+
+    // Record the current location in history
     setHistory([
       ...history,
       {
         title: "New Transcript",
-        path: "/new?step=1"
+        path: `${currentPath}?step=1`
       }
     ]);
-    props.history.push("/new?step=2");
+
+    // Go to the next step
+    props.history.push(newPath);
     return setNext(true);
   };
 
@@ -91,11 +115,16 @@ export default function NewTranscript(props) {
       title
     };
 
+    // If we have an id, assign it as the parent of this transcript
+    if(id) {
+      obj.parent = id;
+    }
+
     postTranscript(obj).then(err => {
       console.log(err);
       if (!err) {
         setHistory([]);
-        props.history.push("/");
+        props.history.push(`/transcripts${id ? `/${id}` : ''}`);
       } else {
         setError(err);
       }
@@ -107,7 +136,16 @@ export default function NewTranscript(props) {
       <div className="new-transcript">
         <div className="controls">
           <div className="left">
-            <h1>New Transcript</h1>
+            <h1>
+              {id ? (
+                <span className='directory'>
+                  {transcript.currentTranscript.title}/ 
+                </span>
+              ) : (
+                ""
+              )}
+              New Transcript
+            </h1>
             <select
               id="voice"
               name="voice"
@@ -124,7 +162,7 @@ export default function NewTranscript(props) {
               ))}
             </select>
             <div className="buttons">
-            <div
+              <div
                 className="button"
                 onClick={() => speak({ text: value, voice, rate: 1, pitch: 1 })}
               >
@@ -175,7 +213,7 @@ export default function NewTranscript(props) {
           <div className="right">
             <p className="error">{error}</p>
             <div className="buttons">
-            <div
+              <div
                 className={`button ${transcript.isPosting && "disabled"}`}
                 onClick={HandlePost}
               >

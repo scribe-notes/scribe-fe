@@ -25,13 +25,6 @@ export default function Navbar() {
       >
         My Transcripts
       </NavLink>
-      <NavLink
-        onClick={() => setHistory([])}
-        to="/new"
-        activeClassName="active-item"
-      >
-        New Transcript
-      </NavLink>
       {userContext.user.isLoading ? <Spinner /> : userContext.user.data === null ? (
         <Link
           onClick={() => setHistory([])}

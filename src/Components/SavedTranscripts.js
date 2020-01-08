@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import TranscriptCard from "./TranscriptCard";
+import HistoryContext from "../contexts/HistoryContext";
 import UserContext from "../contexts/UserContext";
 import TranscriptContext from "../contexts/TranscriptContext";
 import Transcript from "./Transcript";
@@ -32,10 +33,28 @@ export default function SavedTranscripts(props) {
     getTranscript
   } = useContext(TranscriptContext);
 
+  const { history, setHistory } = useContext(HistoryContext);
+
   useEffect(() => {
-    if (transcript.currentTranscript)
+    if (transcript.currentTranscript) {
       setPageTitle(transcript.currentTranscript.title);
-    else if (!id) setPageTitle("Saved Transcripts");
+      console.log(transcript.currentTranscript);
+      // Here, we ensure that we have a history item to take us up a level
+      // if we are inside some directory
+      if (id && history.length == 0 && transcript.currentTranscript._id === id) {
+        let title = "Saved Transcripts";
+        let path = "/transcripts";
+        console.log('creating history...');
+        if (transcript.currentTranscript.parent) {
+          title = transcript.currentTranscript.parent.title;
+          path = `/transcripts/${transcript.currentTranscript.parent}`;
+        }
+        setHistory([
+          ...history,
+          { title, path }
+        ]);
+      }
+    } else if (!id) setPageTitle("Saved Transcripts");
   }, [transcript.currentTranscript, id]);
 
   const getContents = () => {
@@ -50,6 +69,17 @@ export default function SavedTranscripts(props) {
 
   const onChangeFilterBy = option => {
     setFilterBy(option);
+  };
+
+  const handleCreate = () => {
+    setHistory([
+      ...history,
+      {
+        title: pageTitle,
+        path: window.location.pathname
+      }
+    ]);
+    props.history.push(`/new${id ? `/${id}` : ""}`);
   };
 
   const createFolder = () => {
@@ -103,12 +133,18 @@ export default function SavedTranscripts(props) {
               </div>
             </div>
             <div className="right">
-              <div onClick={() => props.history.push("/new")} className={`btn ${transcript.isGetting && 'disabled'}`}>
+              <div
+                onClick={handleCreate}
+                className={`btn ${transcript.isGetting && "disabled"}`}
+              >
                 + NEW TRANSCRIPT
               </div>
               {filterBy !== "shared" && (
                 <>
-                  <div onClick={createFolder} className={`btn ${transcript.isGetting && 'disabled'}`}>
+                  <div
+                    onClick={createFolder}
+                    className={`btn ${transcript.isGetting && "disabled"}`}
+                  >
                     + NEW FOLDER
                   </div>
                   {id && (

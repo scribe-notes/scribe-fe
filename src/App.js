@@ -112,7 +112,7 @@ function App() {
       .catch(err => {
         console.log(err);
         setTranscriptError(err.response.data.message);
-        return err.respone.data.message;
+        return err.respone?.data?.message;
       });
   };
 
@@ -332,6 +332,7 @@ function App() {
                 component={SavedTranscripts}
               />
               <ProtectedRoute exact path="/new" component={NewTranscript} />
+              <ProtectedRoute exact path="/new/:id" component={NewTranscript} />
               {/* <Route exact path="/settings" render={props => <Settings {...props} />} />
         <Route exact path="/help" render={props => <Help {...props} />} /> */}
               <Route
