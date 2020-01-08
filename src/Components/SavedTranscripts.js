@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import { Link } from "react-router-dom";
 import TranscriptCard from "./TranscriptCard";
 import HistoryContext from "../contexts/HistoryContext";
@@ -35,27 +35,28 @@ export default function SavedTranscripts(props) {
 
   const { history, setHistory } = useContext(HistoryContext);
 
+  const validateHistory = useCallback(() => {
+    // Here, we ensure that we have a history item to take us up a level
+    // if we first load into a directory
+    if (id && history.length === 0 && transcript.currentTranscript._id === id) {
+      let title = "Saved Transcripts";
+      let path = "/transcripts";
+      console.log("creating history...");
+      if (transcript.currentTranscript.parent) {
+        title = transcript.currentTranscript.parent.title;
+        path = `/transcripts/${transcript.currentTranscript.parent}`;
+      }
+      setHistory([...history, { title, path }]);
+    }
+  }, [id, history, transcript, setHistory]);
+
   useEffect(() => {
     if (transcript.currentTranscript) {
       setPageTitle(transcript.currentTranscript.title);
       console.log(transcript.currentTranscript);
-      // Here, we ensure that we have a history item to take us up a level
-      // if we are inside some directory
-      if (id && history.length == 0 && transcript.currentTranscript._id === id) {
-        let title = "Saved Transcripts";
-        let path = "/transcripts";
-        console.log('creating history...');
-        if (transcript.currentTranscript.parent) {
-          title = transcript.currentTranscript.parent.title;
-          path = `/transcripts/${transcript.currentTranscript.parent}`;
-        }
-        setHistory([
-          ...history,
-          { title, path }
-        ]);
-      }
+      validateHistory();
     } else if (!id) setPageTitle("Saved Transcripts");
-  }, [transcript.currentTranscript, id]);
+  }, [transcript.currentTranscript, id, validateHistory]);
 
   const getContents = () => {
     if (id) {
