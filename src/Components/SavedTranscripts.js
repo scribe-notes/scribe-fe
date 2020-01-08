@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
-import SavedTranscriptsCards from "./SavedTranscriptsCards";
+import TranscriptCard from "./TranscriptCard";
 import UserContext from "../contexts/UserContext";
 import TranscriptContext from "../contexts/TranscriptContext";
 
@@ -12,6 +12,9 @@ import "./SavedTranscripts.scss";
 
 export default function SavedTranscripts(props) {
   const FILTER_OPTIONS = ["all", "mine", "shared"];
+
+  // Id of a specific transcript/folder
+  const {id} = props.match.params;
 
   const [filterBy, setFilterBy] = useState(FILTER_OPTIONS[0]);
 
@@ -40,7 +43,6 @@ export default function SavedTranscripts(props) {
         ...transcript.transcripts,
         {
           creator: user.id,
-          title: "",
           _id: "newFolder"
         }
       ]
@@ -110,7 +112,7 @@ export default function SavedTranscripts(props) {
               let newFolder = false;
               if (!transcript.createdAt) newFolder = true;
               return (
-                <SavedTranscriptsCards
+                <TranscriptCard
                   submitFolder={submitFolder}
                   cancelFolder={cancelFolder}
                   newFolder={newFolder}

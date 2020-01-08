@@ -6,12 +6,14 @@ import { Spinner } from "@chakra-ui/core";
 
 import options from "../img/options.png";
 
-import "./SavedTranscriptsCards.scss";
+import "./TranscriptCard.scss";
 
-export default function SavedTranscriptsCards(props) {
+export default function TranscriptCard(props) {
   // If this is being rendered to create a folder,
   // this where the ref for the input will live
   const titleSetter = useRef(null);
+  
+  const thisCard = useRef(null);
 
   const { transcript, deleteTranscript, updateTranscript } = useContext(
     TranscriptContext
@@ -19,6 +21,7 @@ export default function SavedTranscriptsCards(props) {
 
   // If this is being rendered to create a folder,
   // this is where our field's data would live
+  console.log(props.title);
   const [newTitle, setNewTitle] = useState(
     props.title ? props.title : "New Folder"
   );
@@ -80,8 +83,23 @@ export default function SavedTranscriptsCards(props) {
     }
   };
 
+  function handleClickOutside(event) {
+    if (showOptions && thisCard.current && !thisCard.current.contains(event.target)) {
+      setShowOptions(false);
+    }
+  }
+
+  useEffect(() => {
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  });
+
   return (
-    <div
+    <div ref={thisCard}
       className={`transcript-card ${props.newFolder &&
         "creating"} ${showOptions && "editing"} ${transcript.isUpdating &&
         "updating"}`}
@@ -103,12 +121,13 @@ export default function SavedTranscriptsCards(props) {
           <>
             <h3>{showOptions ? `Edit '${props.title}'` : props.title}</h3>
             <div className="options-toggle">
+              { showOptions && transcript.isUpdating ? <Spinner /> :
               <img
                 onClick={() => setShowOptions(!showOptions)}
                 className="icon"
                 src={options}
                 alt=""
-              />
+              />}
             </div>
           </>
         )}

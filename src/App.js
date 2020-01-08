@@ -263,6 +263,7 @@ function App() {
               <Navbar />
               <Route path="/" render={props => <History {...props} />} />
               <ProtectedRoute exact path="/" component={SavedTranscripts} />
+              <ProtectedRoute exact path="/transcripts/:id" component={SavedTranscripts} />
               <ProtectedRoute exact path="/new" component={NewTranscript} />
               {/* <Route exact path="/settings" render={props => <Settings {...props} />} />
         <Route exact path="/help" render={props => <Help {...props} />} /> */}
