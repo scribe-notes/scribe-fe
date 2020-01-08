@@ -91,6 +91,15 @@ function App() {
     })
   }
 
+  const fetchUpdatedData = (transcript) => {
+    if(transcript.parent) return AxiosWithAuth().get(
+      `${process.env.REACT_APP_BACKEND}/transcripts/${transcript.parent}
+      `);
+    else return AxiosWithAuth().get(
+      `${process.env.REACT_APP_BACKEND}/transcripts/mine`
+    );
+  }
+
   const getTranscript = transcriptId => {
     setTranscriptGetting(true);
     return AxiosWithAuth()
@@ -111,12 +120,7 @@ function App() {
       .post(`${process.env.REACT_APP_BACKEND}/transcripts`, transcript)
       .then(res => {
         setTranscriptPosting(false);
-        if(transcript.parent) return AxiosWithAuth().get(
-          `${process.env.REACT_APP_BACKEND}/transcripts/${transcript.parent}
-          `);
-        else return AxiosWithAuth().get(
-          `${process.env.REACT_APP_BACKEND}/transcripts/mine`
-        );
+        return fetchUpdatedData(transcript);
       })
       .then(res => {
         if(transcript.parent)
@@ -138,12 +142,12 @@ function App() {
         transcript
       )
       .then(res => {
-        return AxiosWithAuth().get(
-          `${process.env.REACT_APP_BACKEND}/transcripts/mine`
-        );
+        return fetchUpdatedData(transcript);
       })
       .then(res => {
-        setTranscripts(res.data);
+        if(transcript.parent)
+          setCurrentTranscript(res.data);
+        else setTranscripts(res.data);
       })
       .catch(err => {
         console.error(err.response);
@@ -151,20 +155,20 @@ function App() {
       });
   };
 
-  const deleteTranscript = id => {
+  const deleteTranscript = transcript => {
     setTranscriptUpdating(true);
     return AxiosWithAuth()
-      .delete(`${process.env.REACT_APP_BACKEND}/transcripts/${id}`)
+      .delete(`${process.env.REACT_APP_BACKEND}/transcripts/${transcript._id}`)
       .then(res => {
-        return AxiosWithAuth().get(
-          `${process.env.REACT_APP_BACKEND}/transcripts/mine`
-        );
+        return fetchUpdatedData(transcript);
       })
       .then(res => {
-        setTranscripts(res.data);
+        if(transcript.parent)
+          setCurrentTranscript(res.data);
+        else setTranscripts(res.data);
       })
       .catch(err => {
-        console.error(err.response);
+        console.error(err);
         return err.response.data.message;
       });
   };

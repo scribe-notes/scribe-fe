@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState, useContext } from "react";
 import HistoryContext from '../contexts/HistoryContext';
 import TranscriptContext from "../contexts/TranscriptContext";
 
+import share from '../img/share-white.png';
+
 import { Spinner } from "@chakra-ui/core";
 
 import options from "../img/options.png";
@@ -77,10 +79,12 @@ export default function TranscriptCard(props) {
   // If we have changed the title
   const handleSaveDelete = e => {
     e.preventDefault();
+    e.stopPropagation();
     if (props.title === newTitle) {
-      deleteTranscript(props._id);
+      deleteTranscript(props);
     } else {
-      updateTranscript({ title: newTitle, _id: props._id }).then(err => {
+      console.log(props.parent);
+      updateTranscript({ title: newTitle, _id: props._id, parent: props.parent }).then(err => {
         if (!err) setShowOptions(false);
       });
     }
@@ -118,7 +122,7 @@ export default function TranscriptCard(props) {
 
   return (
     <div ref={thisCard}
-         onClick={open}
+         onClick={showOptions ? null : open}
       className={`transcript-card ${props.newFolder &&
         "creating"} ${showOptions && "editing"} ${transcript.isUpdating &&
         "updating"}`}
@@ -161,7 +165,8 @@ export default function TranscriptCard(props) {
             onChange={e => setNewTitle(e.target.value)}
           />
           <div className="buttons">
-            <div className={`share ${transcript.isUpdating && "disabled"}`}>
+            <div className={`share disabled ${transcript.isUpdating && "disabled"}`}>
+              <img src={share} alt='' />
               Share...
             </div>
             <div

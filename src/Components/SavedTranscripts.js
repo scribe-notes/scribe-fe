@@ -5,6 +5,8 @@ import UserContext from "../contexts/UserContext";
 import TranscriptContext from "../contexts/TranscriptContext";
 import Transcript from "./Transcript";
 
+import share from '../img/share-white.png';
+
 import { Spinner } from "@chakra-ui/core";
 
 import Dropdown from "./Dropdown";
@@ -81,7 +83,7 @@ export default function SavedTranscripts(props) {
 
   return (
     <div className="saved-transcripts">
-      <h2>{pageTitle}</h2>
+      <h2>{transcript.isGetting ? <Spinner /> : pageTitle}</h2>
       { id && transcript.currentTranscript && !transcript.currentTranscript.isGroup ? <Transcript /> :
       <div className="list">
         <div className="toolbar">
@@ -101,9 +103,17 @@ export default function SavedTranscripts(props) {
               + NEW TRANSCRIPT
             </div>
             {filterBy !== "shared" && (
+              <>
               <div onClick={createFolder} className="btn">
                 + NEW FOLDER
               </div>
+              {
+                id && <div className="btn disabled">
+                  <img src={share} alt=''/>
+                  SHARE FOLDER
+                </div>
+              }
+              </>
             )}
           </div>
         </div>

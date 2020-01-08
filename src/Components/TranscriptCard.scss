@@ -23,6 +23,7 @@
   &.editing {
     background-color: teal;
     color: white;
+    cursor: default;
     
     &.updating {
       background-color: gray;
@@ -49,6 +50,7 @@
 
     .options-toggle {
       width: 32px;
+      cursor: pointer;
       
       img {
         width: 100%;
@@ -96,14 +98,23 @@
       justify-content: space-between;
 
       .delete, .share {
+        cursor: pointer;
         width: 49%;
         padding: 8px;
         margin: 4px;
         text-align: center;
         font-weight: bold;
         border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         transition: all 0.1s ease-in-out;
+
+        img {
+          height: 16px;
+          margin-right: 6px;
+        }
 
         &.disabled {
           background-color: gray;
