@@ -29,6 +29,7 @@ function App() {
   const [transcript, setTranscript] = useState({
     isGetting: false,
     isPosting: false,
+    isUpdating: false,
     error: "",
     transcripts: []
   });
@@ -49,22 +50,32 @@ function App() {
       isPosting: posting
     });
   };
-  
+
+  const setTranscriptUpdating = updating => {
+    setTranscript({
+      ...transcript,
+      error: "",
+      isUpdating: updating
+    });
+  };
+
   const setTranscriptGetting = getting => {
     setTranscript({
       ...transcript,
       error: "",
       isGetting: getting
-    })
-  }
+    });
+  };
 
   const setTranscripts = transcripts => {
     setTranscript({
       ...transcript,
       isGetting: false,
+      isPosting: false,
+      isUpdating: false,
       transcripts
-    })
-  }
+    });
+  };
 
   const postTranscript = transcript => {
     setTranscriptPosting(true);
@@ -72,7 +83,9 @@ function App() {
       .post(`${process.env.REACT_APP_BACKEND}/transcripts`, transcript)
       .then(res => {
         setTranscriptPosting(false);
-        return AxiosWithAuth().get(`${process.env.REACT_APP_BACKEND}/transcripts/mine`);
+        return AxiosWithAuth().get(
+          `${process.env.REACT_APP_BACKEND}/transcripts/mine`
+        );
       })
       .then(res => {
         setTranscripts(res.data);
@@ -84,19 +97,55 @@ function App() {
       });
   };
 
+  const updateTranscript = transcript => {
+    setTranscriptUpdating(true);
+    return AxiosWithAuth()
+      .put(`${process.env.REACT_APP_BACKEND}/transcripts/${transcript._id}`, transcript)
+      .then(res => {
+        return AxiosWithAuth().get(
+          `${process.env.REACT_APP_BACKEND}/transcripts/mine`
+        );
+      })
+      .then(res => {
+        setTranscripts(res.data);
+      })
+      .catch(err => {
+        console.error(err.response);
+        setTranscriptError(err.response.data.message);
+      });
+  };
+
+  const deleteTranscript = id => {
+    setTranscriptUpdating(true);
+    return AxiosWithAuth()
+      .delete(`${process.env.REACT_APP_BACKEND}/transcripts/${id}`)
+      .then(res => {
+        return AxiosWithAuth().get(
+          `${process.env.REACT_APP_BACKEND}/transcripts/mine`
+        );
+      })
+      .then(res => {
+        setTranscripts(res.data);
+      })
+      .catch(err => {
+        console.error(err.response);
+        return err.response.data.message;
+      });
+  };
+
   const getMyTranscripts = () => {
     setTranscriptGetting(true);
     return AxiosWithAuth()
-    .get(`${process.env.REACT_APP_BACKEND}/transcripts/mine`)
-    .then(res => {
-      setTranscripts(res.data);
-    })
-    .catch(err => {
-      console.log(err);
-      setTranscriptError(err.response.data.message);
-      return err.respone.data.message;
-    });
-  }
+      .get(`${process.env.REACT_APP_BACKEND}/transcripts/mine`)
+      .then(res => {
+        setTranscripts(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+        setTranscriptError(err.response.data.message);
+        return err.respone.data.message;
+      });
+  };
 
   const setUserError = error => {
     setUser({
@@ -197,7 +246,15 @@ function App() {
 
   return (
     <TranscriptContext.Provider
-      value={{ transcript, setTranscript, postTranscript, getMyTranscripts, setTranscripts }}
+      value={{
+        transcript,
+        setTranscript,
+        postTranscript,
+        getMyTranscripts,
+        setTranscripts,
+        deleteTranscript,
+        updateTranscript
+      }}
     >
       <HistoryContext.Provider value={{ history, setHistory }}>
         <UserContext.Provider value={{ user, setUser, logout, login, signup }}>

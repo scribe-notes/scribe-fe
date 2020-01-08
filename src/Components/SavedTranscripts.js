@@ -20,8 +20,7 @@ export default function SavedTranscripts(props) {
     postTranscript,
     getMyTranscripts,
     transcript,
-    setTranscript,
-    setTranscripts
+    setTranscript
   } = useContext(TranscriptContext);
 
   const onChangeFilterBy = option => {

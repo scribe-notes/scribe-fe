@@ -13,11 +13,15 @@ export default function SavedTranscriptsCards(props) {
   // this where the ref for the input will live
   const titleSetter = useRef(null);
 
-  const { transcript, editTranscript } = useContext(TranscriptContext);
+  const { transcript, deleteTranscript, updateTranscript } = useContext(
+    TranscriptContext
+  );
 
   // If this is being rendered to create a folder,
   // this is where our field's data would live
-  const [newTitle, setNewTitle] = useState(props.title ? props.title : "New Folder");
+  const [newTitle, setNewTitle] = useState(
+    props.title ? props.title : "New Folder"
+  );
 
   // Handle submitting a new folder
   const handleSubmit = e => {
@@ -26,6 +30,10 @@ export default function SavedTranscriptsCards(props) {
   };
 
   const [showOptions, setShowOptions] = useState(false);
+
+  useEffect(() => {
+    if (!showOptions) setNewTitle(props.title);
+  }, [showOptions, props.title]);
 
   // If we are creating a folder, focus the input
   // field right away
@@ -60,16 +68,24 @@ export default function SavedTranscriptsCards(props) {
     seconds = `0${seconds}`;
   }
 
-  const handleEdit = () => {
-    editTranscript(newTitle).then(err => {
-      if(!err) {
-        setShowOptions(false);
-      }
-    });
-  }
+  // If we have changed the title
+  const handleSaveDelete = e => {
+    e.preventDefault();
+    if (props.title === newTitle) {
+      deleteTranscript(props._id);
+    } else {
+      updateTranscript({ title: newTitle, _id: props._id }).then(err => {
+        if (!err) setShowOptions(false);
+      });
+    }
+  };
 
   return (
-    <div className={`transcript-card ${props.newFolder && "creating"} ${showOptions && "editing"}`}>
+    <div
+      className={`transcript-card ${props.newFolder &&
+        "creating"} ${showOptions && "editing"} ${transcript.isUpdating &&
+        "updating"}`}
+    >
       <div className="title">
         {props.newFolder ? (
           <form onSubmit={handleSubmit}>
@@ -87,21 +103,37 @@ export default function SavedTranscriptsCards(props) {
           <>
             <h3>{showOptions ? `Edit '${props.title}'` : props.title}</h3>
             <div className="options-toggle">
-              <img onClick={() => setShowOptions(!showOptions)} className="icon" src={options} alt="" />
+              <img
+                onClick={() => setShowOptions(!showOptions)}
+                className="icon"
+                src={options}
+                alt=""
+              />
             </div>
           </>
         )}
       </div>
       {showOptions ? (
-        <form onSubmit={handleEdit} className="options">
-          <label>Rename {props.isGroup ? 'folder' : 'transcript'}</label>
-          <input id="newTitle" value={newTitle} onChange={e => setNewTitle(e.target.value)} />
-          <div className='buttons'>
-            <div className='share'>
+        <form onSubmit={handleSaveDelete} className="options">
+          <label>Rename {props.isGroup ? "folder" : "transcript"}</label>
+          <input
+            disabled={transcript.isUpdating}
+            id="newTitle"
+            value={newTitle}
+            onChange={e => setNewTitle(e.target.value)}
+          />
+          <div className="buttons">
+            <div className={`share ${transcript.isUpdating && "disabled"}`}>
               Share...
             </div>
-            <div className='delete'>
-              Delete
+            <div
+              disabled={transcript.isUpdating}
+              onClick={handleSaveDelete}
+              className={`${
+                props.title === newTitle ? "delete" : "share"
+              } ${transcript.isUpdating && "disabled"}`}
+            >
+              {props.title === newTitle ? "Delete" : "Save"}
             </div>
           </div>
         </form>
