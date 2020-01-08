@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import TranscriptCard from "./TranscriptCard";
 import UserContext from "../contexts/UserContext";
 import TranscriptContext from "../contexts/TranscriptContext";
+import Transcript from "./Transcript";
 
 import { Spinner } from "@chakra-ui/core";
 
@@ -73,7 +74,7 @@ export default function SavedTranscripts(props) {
   };
 
   const submitFolder = title => {
-    const transcript = { title, isGroup: true };
+    const transcript = { title, isGroup: true, parent: id };
 
     postTranscript(transcript);
   };
@@ -81,6 +82,7 @@ export default function SavedTranscripts(props) {
   return (
     <div className="saved-transcripts">
       <h2>{pageTitle}</h2>
+      { id && transcript.currentTranscript && !transcript.currentTranscript.isGroup ? <Transcript /> :
       <div className="list">
         <div className="toolbar">
           <div className="left">
@@ -138,10 +140,12 @@ export default function SavedTranscripts(props) {
             })
         ) : (
           <p className="empty">
-            You have no transcripts! <Link to="/new">Create one now</Link>
+            {id ? 'This folder has no transcripts! ': 'You have no transcripts! '}
+            <Link to="/new">Create one now</Link>
           </p>
         )}
       </div>
+}
     </div>
   );
 }

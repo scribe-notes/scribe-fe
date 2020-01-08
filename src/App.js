@@ -97,7 +97,6 @@ function App() {
       .get(`${process.env.REACT_APP_BACKEND}/transcripts/${transcriptId}`)
       .then(res => {
         setCurrentTranscript(res.data);
-        console.log(res.data);
       })
       .catch(err => {
         console.log(err);
@@ -112,12 +111,17 @@ function App() {
       .post(`${process.env.REACT_APP_BACKEND}/transcripts`, transcript)
       .then(res => {
         setTranscriptPosting(false);
-        return AxiosWithAuth().get(
+        if(transcript.parent) return AxiosWithAuth().get(
+          `${process.env.REACT_APP_BACKEND}/transcripts/${transcript.parent}
+          `);
+        else return AxiosWithAuth().get(
           `${process.env.REACT_APP_BACKEND}/transcripts/mine`
         );
       })
       .then(res => {
-        setTranscripts(res.data);
+        if(transcript.parent)
+          setCurrentTranscript(res.data);
+        else setTranscripts(res.data);
       })
       .catch(err => {
         console.error(err.response.data);

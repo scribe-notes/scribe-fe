@@ -92,6 +92,11 @@ export default function TranscriptCard(props) {
     }
   }
 
+  const toggleShowOptions = e => {
+    e.stopPropagation();
+    setShowOptions(!showOptions);
+  }
+
   useEffect(() => {
     // Bind the event listener
     document.addEventListener("mousedown", handleClickOutside);
@@ -137,7 +142,7 @@ export default function TranscriptCard(props) {
             <div className="options-toggle">
               { showOptions && transcript.isUpdating ? <Spinner /> :
               <img
-                onClick={() => setShowOptions(!showOptions)}
+                onClick={toggleShowOptions}
                 className="icon"
                 src={options}
                 alt=""
