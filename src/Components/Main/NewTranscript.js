@@ -66,7 +66,7 @@ export default function NewTranscript(props) {
   };
   const HandlePost = e => {
     e.preventDefault();
-    let obj = { data: value, recordingLength: recordingLength.toString() , title, isGroup};
+    let obj = { data: value, recordingLength: recordingLength.toString() , title, isGroup,group};
     AxiosWithAuth()
       .post("https://hackathon-livenotes.herokuapp.com/transcripts", obj)
       .then(res => {
