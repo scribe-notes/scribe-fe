@@ -91,9 +91,9 @@ function App() {
         setTranscripts(res.data);
       })
       .catch(err => {
-        console.error(err.response);
-        setTranscriptError(err.response.data.message);
-        return err.response.data.message;
+        console.error(err.response.data);
+        setTranscriptError(err.response.data);
+        return err.response.data;
       });
   };
 

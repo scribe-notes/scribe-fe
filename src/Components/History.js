@@ -22,7 +22,7 @@ const History = props => {
   };
 
   return (
-    <div className="history">
+    <div className={`history ${history.length && 'active'}`}>
       {history.length > 0 && (
         <div className="content" onClick={handleClick}>
           <img src={arrow} alt="" className="arrow" />{" "}

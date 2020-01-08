@@ -1,7 +1,7 @@
 .new-transcript {
   display: flex;
   flex-direction: column;
-  background-color: rgb(247, 247, 247);
+  background-color: rgb(250, 250, 250);
   height: 100%;
 
   .controls {
@@ -14,9 +14,17 @@
     .right {
       width: 25%;
       display: flex;
+      flex-direction: column;
       align-items: flex-end;
       justify-content: flex-end;
+      p {
+        width: 100%;
+        text-align: center;
+        color: crimson;
+        font-weight: bold;
+      }
     }
+
 
     select, h1, p {
       margin: 8px;
@@ -24,7 +32,7 @@
 
     .buttons {
       display: flex;
-      flex-direction: row;
+      flex-direction: row-reverse;
       width: 100%;
       justify-content: space-between;
     }
@@ -41,6 +49,7 @@
       font-size: 24px;
       min-width: 120px;
       max-width: 140px;
+      height: 32px;
 
       transition: all 0.1s ease-in-out;
 

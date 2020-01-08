@@ -15,18 +15,23 @@ export default function NewTranscript(props) {
   const [recordingLength, setRecordingLength] = useState(0);
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
+  const [error, setError] = useState("");
   const [newValue, setNewValue] = useState("");
   const { speak, voices } = useSpeechSynthesis();
   const voice = voices[voiceIndex] || null;
 
   const { history, setHistory } = useContext(HistoryContext);
-  const { postTranscript } = useContext(TranscriptContext);
+  const { postTranscript, transcript } = useContext(TranscriptContext);
 
   const update = () => {
     setValue(value + " " + newValue);
   };
 
   useEffect(update, [newValue]);
+
+  useEffect(() => {
+    setError(transcript.error);
+  }, [transcript.error]);
 
   useEffect(() => {
     const values = queryString.parse(props.location.search);
@@ -75,6 +80,11 @@ export default function NewTranscript(props) {
 
   const HandlePost = e => {
     e.preventDefault();
+
+    // if (!title) return setError("Title is required!");
+
+    // if (!value) return setError("Transcript cannot be blank!");
+
     let obj = {
       data: value,
       recordingLength: recordingLength.toString(),
@@ -84,7 +94,10 @@ export default function NewTranscript(props) {
     postTranscript(obj).then(err => {
       console.log(err);
       if (!err) {
+        setHistory([]);
         props.history.push("/");
+      } else {
+        setError(err);
       }
     });
   };
@@ -111,17 +124,17 @@ export default function NewTranscript(props) {
               ))}
             </select>
             <div className="buttons">
-              <div className="button" onClick={ListenAndTime}>
-                <FaCircle />
-              </div>
-              <div className="button" onClick={StopAndTime}>
-                <FaStopCircle />
-              </div>
-              <div
+            <div
                 className="button"
                 onClick={() => speak({ text: value, voice, rate: 1, pitch: 1 })}
               >
                 <AiFillSound />
+              </div>
+              <div className="button" onClick={StopAndTime}>
+                <FaStopCircle />
+              </div>
+              <div className="button" onClick={ListenAndTime}>
+                <FaCircle />
               </div>
             </div>
           </div>
@@ -132,8 +145,13 @@ export default function NewTranscript(props) {
             </div>
           )}
           <div className="right">
-            <div className={`button ${value.trim() === '' && 'disabled'}`} onClick={NextHandler}>
-              Next
+            <div className="buttons">
+              <div
+                className={`button ${value.trim() === "" && "disabled"}`}
+                onClick={NextHandler}
+              >
+                Next
+              </div>
             </div>
           </div>
         </div>
@@ -155,23 +173,33 @@ export default function NewTranscript(props) {
             <p>Or Discard to cancel</p>
           </div>
           <div className="right">
+            <p className="error">{error}</p>
             <div className="buttons">
-              <div className="button discard" onClick={handleDiscard}>
-                DISCARD
-              </div>
-              <div className="button" onClick={HandlePost}>
+            <div
+                className={`button ${transcript.isPosting && "disabled"}`}
+                onClick={HandlePost}
+              >
                 FINISH
+              </div>
+              <div
+                className={`button discard ${transcript.isPosting &&
+                  "disabled"}`}
+                onClick={handleDiscard}
+              >
+                DISCARD
               </div>
             </div>
           </div>
         </div>
         <input
+          disabled={transcript.isPosting}
           className="title"
           placeholder="Title goes here..."
           value={title}
           onChange={e => setTitle(e.target.value)}
         />
         <textarea
+          disabled={transcript.isPosting}
           className="text"
           value={value}
           onChange={event => setValue(event.target.value)}
