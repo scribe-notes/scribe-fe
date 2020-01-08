@@ -19,6 +19,8 @@ import TranscriptContext from "./contexts/TranscriptContext";
 import AxiosWithAuth from "./util/AxiosWithAuth";
 
 function App() {
+  const [queueTranscripts, setQueueTranscripts] = useState(false);
+
   const [user, setUser] = useState({
     isLoading: true,
     data: null,
@@ -174,6 +176,10 @@ function App() {
   };
 
   const getMyTranscripts = () => {
+    if (!user.data) {
+      if(user.isLoading) setQueueTranscripts(true);
+      return;
+    }
     setTranscriptGetting(true);
     return AxiosWithAuth()
       .get(`${process.env.REACT_APP_BACKEND}/transcripts/mine`)
@@ -283,6 +289,17 @@ function App() {
   };
 
   useEffect(init, []);
+
+  // Actions postponed until user data
+  // bcomes available happen here
+  const runQueue = () => {
+    if(user.data !== null && queueTranscripts){
+      getMyTranscripts();
+      setQueueTranscripts(false);
+    }
+  }
+
+  useEffect(runQueue, [user.data])
 
   return (
     <TranscriptContext.Provider
