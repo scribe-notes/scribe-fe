@@ -15,7 +15,7 @@ const Login = () => {
     password: ""
   });
 
-  const userContext = useContext(UserContext);
+  const {login, user} = useContext(UserContext);
 
   const handleChange = e => {
     setError('');
@@ -28,13 +28,13 @@ const Login = () => {
   const handleLoginSubmit = e => {
     e.preventDefault();
 
-    userContext.login(input)
-    .then(err => {
+    login(input)
+    .finally(err => {
       if (!err) {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: "Welcome to Live Notes!",
+          title: `Welcome back to Scribe!`,
           showConfirmButton: false,
           timer: 1500
         });
@@ -42,7 +42,7 @@ const Login = () => {
     });
   };
 
-  if (userContext.user.data)
+  if (user.data)
     return <Redirect to="/" />;
 
   return (
@@ -58,7 +58,7 @@ const Login = () => {
           <h1 className="heading">Log in to your account</h1>
           <form onSubmit={handleLoginSubmit} className="login-form">
             <input
-              disabled={userContext.user.isLoading}
+              disabled={user.isLoading}
               className="form-input"
               placeholder="Username"
               onChange={handleChange}
@@ -66,7 +66,7 @@ const Login = () => {
               value={input.username}
             />
             <input
-              disabled={userContext.user.isLoading}
+              disabled={user.isLoading}
               className="form-input"
               placeholder="Password"
               name="password"
@@ -75,7 +75,7 @@ const Login = () => {
               type="password"
             />
             <Button
-              disabled={userContext.user.isLoading}
+              disabled={user.isLoading}
               variantColor="teal"
               width="60%"
               rounded="20px"

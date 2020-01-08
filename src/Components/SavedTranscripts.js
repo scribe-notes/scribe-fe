@@ -14,7 +14,7 @@ export default function SavedTranscripts(props) {
   const FILTER_OPTIONS = ["all", "mine", "shared"];
 
   // Id of a specific transcript/folder
-  const {id} = props.match.params;
+  // const {id} = props.match.params;
 
   const [filterBy, setFilterBy] = useState(FILTER_OPTIONS[0]);
 

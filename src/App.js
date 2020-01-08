@@ -177,6 +177,7 @@ function App() {
       .post(`${process.env.REACT_APP_BACKEND}/login`, { username, password })
       .then(res => {
         localStorage.setItem("token", res.data.token);
+        console.log(res.data);
         assignUserData(res.data);
       })
       .catch(err => {

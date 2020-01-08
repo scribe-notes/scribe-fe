@@ -38,7 +38,7 @@ const Signup = () => {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: "Welcome to Live Notes!",
+          title: "Welcome to Scribe!",
           showConfirmButton: false,
           timer: 1500
         });
