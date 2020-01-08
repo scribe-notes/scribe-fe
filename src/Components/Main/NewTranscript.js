@@ -166,7 +166,7 @@ export default function NewTranscript(props) {
           <div className="left">
             <h1>Save Transcript</h1>
             <p>
-              Please Review the fillowing transcript and make corrections as
+              Please Review the following transcript and make corrections as
               needed.
             </p>
             <p>Click Finish when done</p>
