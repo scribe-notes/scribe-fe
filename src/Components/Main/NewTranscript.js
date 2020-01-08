@@ -81,9 +81,9 @@ export default function NewTranscript(props) {
   const HandlePost = e => {
     e.preventDefault();
 
-    // if (!title) return setError("Title is required!");
+    if (!title) return setError("Title is required!");
 
-    // if (!value) return setError("Transcript cannot be blank!");
+    if (!value) return setError("Transcript cannot be blank!");
 
     let obj = {
       data: value,
