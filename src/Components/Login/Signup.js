@@ -1,20 +1,25 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useContext } from "react";
+import { Link, Redirect } from "react-router-dom";
+import UserContext from "../../contexts/UserContext";
 import Swal from "sweetalert2";
-import "./Form.css";
+import "./Form.scss";
 import { Button, PseudoBox } from "@chakra-ui/core";
 import { Box, Heading } from "@chakra-ui/core";
 
-const Signup = props => {
-  const [error, setError] = useState();
+const Signup = () => {
+  const [error, setError] = useState(null);
 
   const [input, setInput] = useState({
+    email: "",
     username: "",
-    password: ""
+    password: "",
+    password_confirmation: ""
   });
 
+  const userContext = useContext(UserContext);
+
   const handleChange = e => {
+    setError('');
     setInput({
       ...input,
       [e.target.name]: e.target.value
@@ -23,21 +28,24 @@ const Signup = props => {
 
   const handleLoginSubmit = e => {
     e.preventDefault();
-    axios
-      .post("https://hackathon-livenotes.herokuapp.com/users", input)
-      .then(res => {
-        console.log("login submit results", res);
-        setError(false);
-        // window.localStorage.setItem('token', JSON.stringify(res.data.access_token))
-        props.history.push("/login");
-      })
-      .catch(err => {
-        console.error(err.response.data.message);
-        setError(err.response.data.message);
-        //   setError(err.data.message)
-        //   console.log(err.data.message)
-      });
+    setError(null);
+    if (input.password !== input.password_confirmation)
+      return setError("Passwords do not match!");
+
+    userContext.signup(input)
+    .then(err => {
+      if (!err) {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Welcome to Scribe!",
+          showConfirmButton: false,
+          timer: 1500
+        });
+      } else setError(err);
+    });
   };
+
   if (error === false) {
     Swal.fire({
       position: "center",
@@ -48,51 +56,52 @@ const Signup = props => {
     });
   }
 
-  //   if(token){
-  //     return <Redirect to="/"/>
-  //   }
+  if (userContext.user.data) {
+    return <Redirect to="/" />;
+  }
   return (
-    <div className="col-container">
-      <div className="col1">
-        <div className="heading-container">
-          <Heading as="h1">Where to next?</Heading>
-          <strong>
-            <p>Welcome Back!</p>
-            <p>Please sign in </p>
-            <p>with your info.</p>
-          </strong>
-          <Link to="/login">
-            <PseudoBox
-              as="button"
-              height="44px"
-              width="80%"
-              lineHeight="1.2"
-              transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
-              // border="1px"
-              px="8px"
-              rounded="22px"
-              fontSize="14px"
-              fontWeight="semibold"
-              bg="#319795"
-              // borderColor="#ccd0d5"
-              color="white"
-              // _hover={{ bg: "#ebedf0" }}
-              _active={{
-                bg: "#dddfe2",
-                transform: "scale(0.98)",
-                borderColor: "#bec3c9"
-              }}
-              _focus={{
-                boxShadow:
-                  "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)"
-              }}
-            >
-              Login
-            </PseudoBox>
-          </Link>
-        </div>
+    <div className="signup">
+      <div className="left">
+        <Heading as="h1">Already registered?</Heading>
+        <strong>
+          <p>Welcome Back!</p>
+          <p>Please sign in to your account below</p>
+        </strong>
+        <Link to="/login">
+          <PseudoBox
+            as="button"
+            height="44px"
+            width="80%"
+            lineHeight="1.2"
+            transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
+            // border="1px"
+            px="8px"
+            rounded="22px"
+            fontSize="14px"
+            fontWeight="semibold"
+            bg="white"
+            // borderColor="#ccd0d5"
+            color="#319795"
+            // _hover={{ bg: "#ebedf0" }}
+            _active={{
+              bg: "#dddfe2",
+              transform: "scale(0.98)",
+              borderColor: "#bec3c9"
+            }}
+            _focus={{
+              boxShadow:
+                "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)"
+            }}
+            _hover={{
+              bg: "#3bc2c2",
+              color: "white"
+            }}
+          >
+            Login
+          </PseudoBox>
+        </Link>
       </div>
-      <div className="col2">
+      <div className="right">
         <Box
           p={5}
           shadow="lg"
@@ -100,20 +109,27 @@ const Signup = props => {
           rounded="lg"
           className="form-container"
         >
-          <h1 className="heading">Create an account.</h1>
-          <div className="auth-links">
-            <div>{error}</div>
-          </div>
+          <h1 className="heading">Create an account</h1>
           <form onSubmit={handleLoginSubmit} className="signup-form">
             <input
+              disabled={userContext.user.isLoading}
+              className="form-input"
+              placeholder="Email"
+              value={input.email}
+              name="email"
+              onChange={handleChange}
+              type="email"
+            />
+            <input
+              disabled={userContext.user.isLoading}
               className="form-input"
               placeholder="Username"
               onChange={handleChange}
               name="username"
               value={input.username}
             />
-
             <input
+              disabled={userContext.user.isLoading}
               className="form-input"
               placeholder="Password"
               name="password"
@@ -121,14 +137,31 @@ const Signup = props => {
               onChange={handleChange}
               type="password"
             />
+            <input
+              disabled={userContext.user.isLoading}
+              className="form-input"
+              placeholder="Confirm Password"
+              name="password_confirmation"
+              value={input.password_confirmation}
+              onChange={handleChange}
+              type="password"
+            />
+            <span className="help">
+              Password must be at least 8 characters long.
+            </span>
             <Button
+              disabled={userContext.user.isLoading}
               variantColor="teal"
               width="60%"
-              rounded="20px"
-              onClick={handleLoginSubmit}
+              marginTop="8px"
+              rounded="8px"
+              type='submit'
             >
               Sign up
             </Button>
+            <div className="error">
+              {error}
+            </div>
           </form>
         </Box>
       </div>

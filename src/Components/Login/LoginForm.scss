@@ -1,0 +1,96 @@
+.login {
+  height: 90vh;
+  display: flex;
+  width: 100%;
+
+  .left {
+    background-color: lightgray;
+    height: 100%;
+    width: 70%;
+    display: flex;
+    align-items: center;
+    box-shadow: inset -10px 0px 10px -8px #363636;
+
+    .form-container {
+      margin: auto;
+      padding: 24px;
+      background-color: white;
+
+      .heading {
+        user-select: none;
+      }
+
+      .error {
+        color: crimson;
+        padding: 8px 0;
+      }
+
+      .login-form {
+        display: flex;
+        flex-direction: column;
+        min-width: 350px;
+
+        .form-input {
+          border: 1.5px solid gray;
+          border-radius: 7px;
+          padding: 8px;
+          margin: 6px 0;
+          font-size: 16px;
+          color: rgb(41, 41, 41);
+
+          transition: all 0.1s ease-in-out;
+        
+          &:focus {
+            border-color: #3bc2c2;
+            outline: none;
+            
+          }
+
+          &:disabled {
+            background-color: gray;
+          }
+        }
+
+        button {
+          width: 100%;
+          cursor: pointer;
+          border: none;
+
+          transition: all 0.1s ease-in-out;
+
+          &:disabled {
+            background-color: gray;
+          }
+        }
+      }
+    }
+  }
+
+  .right {
+    height: 100%;
+    width: 30%;
+    background-color: lightseagreen;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+
+    padding: 0 16px;
+
+    p {
+      color: rgb(250, 250, 250);
+    }
+
+    a {
+      width: 100%;
+      
+      button {
+        width: 100%;
+        cursor: pointer;
+        border: 2px solid white;
+      }
+    }
+  }
+}

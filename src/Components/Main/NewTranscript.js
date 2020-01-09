@@ -2,9 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import { useSpeechRecognition, useSpeechSynthesis } from "react-speech-kit";
 import { FaStopCircle, FaCircle } from "react-icons/fa";
 import { AiFillSound } from "react-icons/ai";
-import { Redirect } from "react-router-dom";
-import AxiosWithAuth from "./AxiosWithAuth";
+import queryString from "query-string";
 
+import TranscriptContext from "../../contexts/TranscriptContext";
 import HistoryContext from "../../contexts/HistoryContext";
 
 import "./NewTranscript.scss";
@@ -12,40 +12,77 @@ import "./NewTranscript.scss";
 export default function NewTranscript(props) {
   const [voiceIndex, setVoiceIndex] = useState(null);
   const [next, setNext] = useState(false);
-  const [token, setToken] = useState(false);
   const [recordingLength, setRecordingLength] = useState(0);
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
+  const [error, setError] = useState("");
   const [newValue, setNewValue] = useState("");
   const { speak, voices } = useSpeechSynthesis();
   const voice = voices[voiceIndex] || null;
 
   const { history, setHistory } = useContext(HistoryContext);
+  const { postTranscript, transcript, getTranscript } = useContext(TranscriptContext);
+
+  // Id of a parent, if any
+  const { id } = props.match.params;
 
   const update = () => {
     setValue(value + " " + newValue);
+  };
+
+  const init = () => {
+    // If we have an id but no data for it, get it
+    if(!transcript.currentTranscript && id)
+      getTranscript(id);
   }
 
+  useEffect(init, [id]);
+
   useEffect(update, [newValue]);
+
+  useEffect(() => {
+    setError(transcript.error);
+  }, [transcript.error]);
+
+  useEffect(() => {
+    const values = queryString.parse(props.location.search);
+
+    if (values.step) {
+      if (values.step === "1") {
+        setNext(false);
+      } else {
+        setNext(true);
+      }
+    }
+  }, [props.location.search]);
 
   const { listen, listening, stop } = useSpeechRecognition({
     onResult: result => setNewValue(result)
   });
 
-  useEffect(() => {
-    setToken(localStorage.getItem("token"));
-  }, []);
-
   const NextHandler = () => {
-    console.log(history);
-    if(listening) StopAndTime();
+    if (listening) StopAndTime();
+    // Get the current pathname
+    let currentPath = window.location.pathname;
+
+    // If there is a residual query string, remove it
+    const end = currentPath.indexOf("?step=");
+    if (end !== -1) currentPath = currentPath.slice(0, end);
+
+    // Define where to go from here
+    const newPath = `${currentPath}?step=2`;
+
+    // Record the current location in history
     setHistory([
       ...history,
       {
         title: "New Transcript",
-        path: "/new"
+        path: `${currentPath}?step=1`
       }
     ]);
+
+    // Go to the next step
+    props.history.push(newPath);
     return setNext(true);
   };
 
@@ -54,33 +91,61 @@ export default function NewTranscript(props) {
 
     listen({ interimResults: false });
   };
+
   const StopAndTime = () => {
     setRecordingLength(Math.round((Date.now() - recordingLength) / 1000));
-    console.log(recordingLength, "recording");
     stop();
   };
-  const HandlePost = e => {
-    e.preventDefault();
-    let obj = { data: value, recordingLength: recordingLength.toString() , title };
-    AxiosWithAuth()
-      .post("https://hackathon-livenotes.herokuapp.com/transcripts", obj)
-      .then(res => {
-        console.log(res);
-        props.history.push('/');
-      })
-      .catch(err => {
-        console.error(err.response);
-      });
+
+  const handleDiscard = () => {
+    props.history.push("/new");
+    window.location.reload();
   };
 
-  if (token === null) {
-    return <Redirect to="/login" />;
-  } else if (!next) {
+  const HandlePost = e => {
+    e.preventDefault();
+
+    if (!title) return setError("Title is required!");
+
+    if (!value) return setError("Transcript cannot be blank!");
+
+    let obj = {
+      data: value,
+      recordingLength: recordingLength.toString(),
+      title
+    };
+
+    // If we have an id, assign it as the parent of this transcript
+    if(id) {
+      obj.parent = id;
+    }
+
+    postTranscript(obj).then(err => {
+      console.log(err);
+      if (!err) {
+        setHistory([]);
+        props.history.push(`/transcripts${id ? `/${id}` : ''}`);
+      } else {
+        setError(err);
+      }
+    });
+  };
+
+  if (!next) {
     return (
       <div className="new-transcript">
         <div className="controls">
           <div className="left">
-            <h1>New Transcript</h1>
+            <h1>
+              {id ? (
+                <span className='directory'>
+                  {transcript.currentTranscript.title}/ 
+                </span>
+              ) : (
+                ""
+              )}
+              New Transcript
+            </h1>
             <select
               id="voice"
               name="voice"
@@ -97,17 +162,17 @@ export default function NewTranscript(props) {
               ))}
             </select>
             <div className="buttons">
-              <div className="button" onClick={ListenAndTime}>
-                <FaCircle />
-              </div>
-              <div className="button" onClick={StopAndTime}>
-                <FaStopCircle />
-              </div>
               <div
                 className="button"
                 onClick={() => speak({ text: value, voice, rate: 1, pitch: 1 })}
               >
                 <AiFillSound />
+              </div>
+              <div className="button" onClick={StopAndTime}>
+                <FaStopCircle />
+              </div>
+              <div className="button" onClick={ListenAndTime}>
+                <FaCircle />
               </div>
             </div>
           </div>
@@ -118,8 +183,13 @@ export default function NewTranscript(props) {
             </div>
           )}
           <div className="right">
-            <div className="button" onClick={NextHandler}>
-              Next
+            <div className="buttons">
+              <div
+                className={`button ${value.trim() === "" && "disabled"}`}
+                onClick={NextHandler}
+              >
+                Next
+              </div>
             </div>
           </div>
         </div>
@@ -134,29 +204,41 @@ export default function NewTranscript(props) {
           <div className="left">
             <h1>Save Transcript</h1>
             <p>
-              Please Review the fillowing transcript and make corrections as
+              Please Review the following transcript and make corrections as
               needed.
             </p>
             <p>Click Finish when done</p>
-            <p>Or Discard to exit</p>
+            <p>Or Discard to cancel</p>
           </div>
           <div className="right">
+            <p className="error">{error}</p>
             <div className="buttons">
               <div
-                className="button discard"
-                onClick={() => document.location.reload()}
+                className={`button ${transcript.isPosting && "disabled"}`}
+                onClick={HandlePost}
+              >
+                FINISH
+              </div>
+              <div
+                className={`button discard ${transcript.isPosting &&
+                  "disabled"}`}
+                onClick={handleDiscard}
               >
                 DISCARD
-              </div>
-              <div className="button" onClick={HandlePost}>
-                FINISH
               </div>
             </div>
           </div>
         </div>
-        <input className='title' placeholder='Title goes here...' value={title} onChange={e => setTitle(e.target.value)} />
+        <input
+          disabled={transcript.isPosting}
+          className="title"
+          placeholder="Title goes here..."
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+        />
         <textarea
-          className='text'
+          disabled={transcript.isPosting}
+          className="text"
           value={value}
           onChange={event => setValue(event.target.value)}
         />

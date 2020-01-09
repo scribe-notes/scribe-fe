@@ -1,7 +1,7 @@
 .new-transcript {
   display: flex;
   flex-direction: column;
-  background-color: rgb(247, 247, 247);
+  background-color: rgb(250, 250, 250);
   height: 100%;
 
   .controls {
@@ -9,25 +9,42 @@
     display: flex;
     justify-content: space-between;
 
-    margin: 0 6rem;
+    margin: 0.5rem 2.5rem;
+
+    .directory{
+      color: teal;
+      margin-right: 1rem;
+    }
 
     .right {
       width: 25%;
       display: flex;
+      flex-direction: column;
       align-items: flex-end;
       justify-content: flex-end;
+      p {
+        width: 100%;
+        text-align: center;
+        color: crimson;
+        font-weight: bold;
+      }
+    }
+
+
+    select, h1, p {
+      margin: 8px;
     }
 
     .buttons {
       display: flex;
-      flex-direction: row;
+      flex-direction: row-reverse;
       width: 100%;
       justify-content: space-between;
     }
 
     .button {
       cursor: pointer;
-      background-color: lightskyblue;
+      background-color: lightseagreen;
       color: white;
       padding: 12px;
       border-radius: 12px;
@@ -35,10 +52,18 @@
       flex-grow: 500;
       text-align: center;
       font-size: 24px;
-
+      min-width: 120px;
       max-width: 140px;
+      height: 32px;
 
       transition: all 0.1s ease-in-out;
+
+      &.disabled {
+        pointer-events: none;
+        opacity: 0.7;
+        background-color: gray;
+        cursor: default;
+      }
 
       &.discard {
         background-color: crimson;
@@ -50,7 +75,7 @@
     }
 
     .button:hover {
-      background-color: rgb(170, 215, 243);
+      background-color: rgb(46, 209, 201);
     }
 
     .center {
@@ -71,17 +96,24 @@
   .title {
     height: 16px;
     font-size: 20px;
-    margin: 0 32px;
+    margin: 0 2.5rem;
     border: 1px solid gray;
     border-radius: 12px;
     text-align: left;
-    padding: 12px;
+    padding: 12px 1rem;
   }
 
   .text {
+    padding: 1rem 0.5rem;
     height: 480px;
-    margin: 32px;
+    margin: 1rem 2.5rem;
     border-radius: 16px;
+  }
+
+  .text, .title {
+    &:focus {
+      outline: none;
+    }
   }
 
 }

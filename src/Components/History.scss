@@ -3,13 +3,28 @@
   font-weight: bold;
   color: dodgerblue;
   user-select: none;
-  cursor: pointer;
-  background-color: rgb(247, 247, 247);
+  
+  // background-color: rgb(250, 250, 250);
+  height: 0px;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+
+  transition: all 0.1s ease-in-out;
+
+  &.active {
+    height: 64px;
+    opacity: 1;
+  }
 
   .content {
     display: flex;
     flex-direction: row;
     align-items: center;
+    width: max-content;
+    cursor: pointer;
     .arrow {
       padding: 8px;
       height: 32px;
@@ -18,10 +33,17 @@
     p {
       font-size: 20px;
       transition: all 0.1s ease-in-out;
+      margin: 0;
     }
 
-    p:hover {
-      color: rgb(109, 182, 255);
+    img {
+      transition: all 0.1s ease-in-out;
+    }
+
+    &:hover {
+      p, img {
+        opacity: 0.7;
+      }
     }
   }
 }

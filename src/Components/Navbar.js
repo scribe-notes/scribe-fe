@@ -1,48 +1,59 @@
-import React,{useState,useEffect, useContext} from 'react'
-import {Link, NavLink} from 'react-router-dom'
+import React, { useContext } from "react";
+import { Link, NavLink } from "react-router-dom";
 
-import HistoryContext from '../contexts/HistoryContext';
+import HistoryContext from "../contexts/HistoryContext";
+import UserContext from "../contexts/UserContext";
 
-import './Navbar.scss';
+import { Spinner } from "@chakra-ui/core";
+
+import "./Navbar.scss";
 
 export default function Navbar() {
-    const [token,setToken] = useState(false);
+  const { setHistory } = useContext(HistoryContext);
+  const { user, logout } = useContext(UserContext);
 
-    const { setHistory } = useContext(HistoryContext);
-
-    useEffect(() => {
-        setToken(localStorage.getItem("token"))
-
-        // document.location.reload(true)
-        },[])
-
-    return (
-        <div className='navbar'>
-            <Link onClick={() => setHistory([])} to='/'><h2 className='title'>LiveNotes</h2></Link>
-            <NavLink onClick={() => setHistory([])} to ="/new" activeClassName='active-item'>
-                New Transcript
-            </NavLink>
-            <NavLink onClick={() => setHistory([])} exact to="/" activeClassName='active-item'>
-                Saved Transcripts
-            </NavLink>
-            {token === null ? (
-            <NavLink onClick={() => setHistory([])} to="/login" activeClassName="active-item">
-              login
-            </NavLink>
-          ) : (
-            <NavLink onClick={() => setHistory([])} to="/login" activeClassName="active-item">
-              <div
-                className="btn"
-                type="submit"
-                onClick={() => {
-                  localStorage.removeItem("token");
-                  setToken(null);
-                }}
-              >
-                Logout
-              </div>
-            </NavLink>
+  return (
+    <div className="navbar">
+      <div className="left">
+        <Link onClick={() => setHistory([])} to="/transcripts">
+          <h2 className="title">scribe</h2>
+        </Link>
+        <NavLink
+          onClick={() => setHistory([])}
+          to="/transcripts"
+          activeClassName="active-item"
+        >
+          My Transcripts
+        </NavLink>
+        {user.isLoading ? (
+          <Spinner />
+        ) : user.data === null ? (
+          <Link onClick={() => setHistory([])} to="/login">
+            Log In
+          </Link>
+        ) : (
+          <div
+            className="btn"
+            type="submit"
+            onClick={() => {
+              setHistory([]);
+              localStorage.removeItem("token");
+              logout();
+            }}
+          >
+            Logout
+          </div>
+        )}
+      </div>
+      <div className="right">
+        <div className="username">
+          {user.data && (
+            <span>
+              Signed in as <strong>{user.data.username}</strong>
+            </span>
           )}
         </div>
-    )
+      </div>
+    </div>
+  );
 }

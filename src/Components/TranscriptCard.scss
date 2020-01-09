@@ -1,0 +1,156 @@
+.transcript-card {
+  border: 1px solid gray;
+  width: 256px;
+  height: 164px;
+  border-radius: 12px;
+  padding: 8px;
+  margin: 8px;
+  user-select: none;
+  cursor: pointer;
+  background-color: white;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  transition: all 0.1s ease-in-out;
+
+  &.creating {
+    border-color: lightseagreen;
+    border-style: dashed;
+  }
+
+  &.editing {
+    background-color: teal;
+    color: white;
+    cursor: default;
+    
+    &.updating {
+      background-color: gray;
+    }
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h3 {
+      display: block;
+      white-space: nowrap;
+      height: 25px;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .create {
+      color: lightseagreen;
+    }
+
+    .options-toggle {
+      width: 32px;
+      cursor: pointer;
+      
+      img {
+        width: 100%;
+
+        transition: all 0.2s ease-in-out;
+
+        &:hover {
+          transform: rotate(45deg);
+        }
+      }
+    }
+  }
+
+  h3 {
+    width: 100%;
+    margin: 0.5em 0;
+  }
+
+  #newTitle {
+    width: 100%;
+    display: flex;
+    flex-shrink: 500;
+    border-radius: 7px;
+    border: 2px solid gray;
+    padding: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0.5em 0;
+    box-sizing: border-box;
+
+    transition: all 0.1s ease-in-out;
+
+    &:focus {
+      outline: none;
+      border: 2px solid lightseagreen;
+    }
+  }
+
+  .options {
+    height: 100%;
+
+    .buttons {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+
+      .delete, .share {
+        cursor: pointer;
+        width: 49%;
+        padding: 8px;
+        margin: 4px;
+        text-align: center;
+        font-weight: bold;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        transition: all 0.1s ease-in-out;
+
+        img {
+          height: 16px;
+          margin-right: 6px;
+        }
+
+        &.disabled {
+          background-color: gray;
+          opacity: 0.7;
+          cursor: default;
+          pointer-events: none;
+        }
+      }
+
+      .share {
+        background-color: lightseagreen;
+
+        &:hover {
+          background-color: rgb(101, 223, 217);
+        }
+      }
+
+      .delete {
+        background-color: crimson;
+
+        &:hover {
+          background-color: red;
+        }
+      }
+    }
+  }
+
+  .length {
+    color: gray;
+  }
+
+  .preview {
+    flex-grow: 500;
+  }
+
+  &:hover {
+    box-shadow: 0 0 6px -2px gray;
+  }
+}
