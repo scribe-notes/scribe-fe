@@ -11,13 +11,13 @@
 # Key Features
 
 - v1.0 (current)
-      - Users can record and save transcripts
-      - Users can create folders and create transcripts within them
+	- Users can record and save transcripts
+	- Users can create folders and create transcripts within them
       
 - v1.1 (next)
-      - Users can share transcripts with other users
-      - Users can share folders with other users
-      - Users can adjust privacy settings on their transcripts
+	- Users can share transcripts with other users
+	- Users can share folders with other users
+	- Users can adjust privacy settings on their transcripts
 
 # Tech Stack
 
