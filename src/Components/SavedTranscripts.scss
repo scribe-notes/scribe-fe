@@ -13,7 +13,8 @@
 
   .list {
     display: flex;
-    flex-flow: row wrap;
+    flex-flow: column nowrap;
+    width: 100%;
     
     .toolbar {
       display: flex;
@@ -68,6 +69,42 @@
             background-color: rgb(62, 173, 173);
           }
         }
+      }
+    }
+
+    .viewer {
+      display: flex;
+      align-items: center;
+      
+      .icon {
+        width: 40px;
+        margin: 8px;
+        border-right: 1px solid black;
+      }
+
+      .name {
+        width: 50%;
+        margin: 8px;
+        border-right: 1px solid black;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      .date-created {
+        margin: 8px;
+        border-right: 1px solid black;
+        width: 30%;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      .duration {
+        font-weight: bold;
+        text-align: right;
+        margin: 8px;
+        flex-shrink: 500;
+        width: 100%;
+        cursor: pointer;
       }
     }
 

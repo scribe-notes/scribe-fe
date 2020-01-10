@@ -1,16 +1,14 @@
 .transcript-card {
-  border: 1px solid gray;
-  width: 256px;
-  height: 164px;
-  border-radius: 12px;
+  box-sizing: border-box;
+  align-items: center;
+  border-top: 1px solid gray;
+  width: 100%;
+  height: 80px;
   padding: 8px;
-  margin: 8px;
   user-select: none;
   cursor: pointer;
-  background-color: white;
 
   display: flex;
-  flex-direction: column;
   justify-content: space-between;
 
   transition: all 0.1s ease-in-out;
@@ -24,16 +22,24 @@
     background-color: teal;
     color: white;
     cursor: default;
-    
+
     &.updating {
       background-color: gray;
     }
+  }
+
+  .icon {
+    height: 40px;
+    width: 40px;
+    padding: 4px;
   }
 
   .title {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 50%;
+    padding: 8px;
 
     h3 {
       display: block;
@@ -51,7 +57,7 @@
     .options-toggle {
       width: 32px;
       cursor: pointer;
-      
+
       img {
         width: 100%;
 
@@ -67,6 +73,11 @@
   h3 {
     width: 100%;
     margin: 0.5em 0;
+  }
+
+  .date-created {
+    padding: 8px;
+    width: 35%;
   }
 
   #newTitle {
@@ -97,7 +108,8 @@
       width: 100%;
       justify-content: space-between;
 
-      .delete, .share {
+      .delete,
+      .share {
         cursor: pointer;
         width: 49%;
         padding: 8px;
@@ -143,7 +155,9 @@
   }
 
   .length {
+    width: 10%;
     color: gray;
+    text-align: right;
   }
 
   .preview {
@@ -151,6 +165,7 @@
   }
 
   &:hover {
-    box-shadow: 0 0 6px -2px gray;
+    background-color: white;
+    // box-shadow: 0 0 6px -2px gray;
   }
 }

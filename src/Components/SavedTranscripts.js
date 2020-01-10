@@ -162,6 +162,12 @@ export default function SavedTranscripts(props) {
               )}
             </div>
           </div>
+          <div className='viewer'>
+              <div className='icon'></div>
+              <div className='name'>Name</div>
+              <div className='date-created'>Date Created</div>
+              <div className='duration'>Duration</div>
+          </div>
           {transcript.isGetting ? (
             <div className="stretch">
               <Spinner />

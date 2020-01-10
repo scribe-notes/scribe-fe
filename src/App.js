@@ -187,7 +187,7 @@ function App() {
         setTranscripts(res.data);
       })
       .catch(err => {
-        console.log(err);
+        console.log(err.response);
         setTranscriptError(err.response.data.message);
         return err.respone.data.message;
       });

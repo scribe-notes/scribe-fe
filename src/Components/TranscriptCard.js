@@ -3,11 +3,16 @@ import React, { useEffect, useRef, useState, useContext } from "react";
 import HistoryContext from '../contexts/HistoryContext';
 import TranscriptContext from "../contexts/TranscriptContext";
 
+import moment from 'moment';
+
 import share from '../img/share-white.png';
 
 import { Spinner } from "@chakra-ui/core";
 
 import options from "../img/options.png";
+
+import folderIcon from "../img/folder.png"
+import transcriptIcon from "../img/transcript.jpg"
 
 import "./TranscriptCard.scss";
 
@@ -127,6 +132,7 @@ export default function TranscriptCard(props) {
         "creating"} ${showOptions && "editing"} ${transcript.isUpdating &&
         "updating"}`}
     >
+      <img className='icon' src={ props.isGroup ? folderIcon : transcriptIcon } alt='' />
       <div className="title">
         {props.newFolder ? (
           <form onSubmit={handleSubmit}>
@@ -143,7 +149,7 @@ export default function TranscriptCard(props) {
         ) : (
           <>
             <h3>{showOptions ? `Edit '${props.title}'` : props.title}</h3>
-            <div className="options-toggle">
+            {/* <div className="options-toggle">
               { showOptions && transcript.isUpdating ? <Spinner /> :
               <img
                 onClick={toggleShowOptions}
@@ -151,9 +157,12 @@ export default function TranscriptCard(props) {
                 src={options}
                 alt=""
               />}
-            </div>
+            </div> */}
           </>
         )}
+      </div>
+      <div className='date-created'>
+        {moment(props.createdAt).fromNow()}
       </div>
       {showOptions ? (
         <form onSubmit={handleSaveDelete} className="options">
@@ -182,17 +191,6 @@ export default function TranscriptCard(props) {
         </form>
       ) : (
         <>
-          <div className="preview" maxLength={180}>
-            {props.newFolder ? (
-              transcript.isPosting ? (
-                <Spinner />
-              ) : (
-                ""
-              )
-            ) : (
-              <p>{props.data}</p>
-            )}
-          </div>
           <p className="length">
             {!props.isGroup && !props.newFolder
               ? `${hours}:${minutes}:${seconds}`
