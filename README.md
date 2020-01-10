@@ -18,6 +18,10 @@
 	- Users can share transcripts with other users
 	- Users can share folders with other users
 	- Users can adjust privacy settings on their transcripts
+	
+- v1.2 (future)
+	- Users can choose to save audio recordings along with their transcripts
+	- Users can use voice commands to start/stop recording
 
 # Tech Stack
 
