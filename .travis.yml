@@ -10,10 +10,8 @@ cache:
     - node_modules
 
 script:
-  - cd client
-  - npm install
-  - npm test -u
-  - npm run build
+  - yarn
+  - yarn build
 
 notification:
   - email: false
