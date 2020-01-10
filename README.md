@@ -71,4 +71,4 @@ These contribution guidelines have been adapted from [this good-Contributing.md-
 
 ## Backend Documentation
 
-See [here](https://github.com/Lambda-School-Labs/designhub-be) for details on the backend of our project.
+See [here](https://github.com/Breath-Taken/Breath-Taken-BE) for details on the backend of our project.
