@@ -2,7 +2,7 @@
 
 - A transcript note-taking app with organizational features that allow users to effectively record and store transcripts
 
-- Deployed project can be found [here](https://notaking-with-scribe.netlify.com/).
+- Deployed project can be found [here](https://scribe-notes.netlify.com/).
 
 ![MIT](https://img.shields.io/packagist/l/doctrine/orm.svg)
 ![React](https://img.shields.io/badge/react-v16.12.0-blue)
