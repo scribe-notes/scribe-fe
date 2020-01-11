@@ -13,8 +13,8 @@ const Transcript = props => {
     <div className="transcript">
       <div className="toolbar">
         <div className="left">
-          <div className="btn disabled">Edit</div>
-          <div className="btn disabled">Narrate</div>
+          <div className="default-btn disabled">Edit</div>
+          <div className="default-btn disabled">Narrate</div>
         </div>
         <div className="right">
           {/* If shared, show this */}
@@ -22,7 +22,7 @@ const Transcript = props => {
             Shared with {currentTranscript.sharedWith.length}
           </label>
           {/* Here will be a list of people */}
-          <div className="btn disabled">
+          <div className="default-btn disabled">
             <img src={share} alt='' />
             Share...
             </div>

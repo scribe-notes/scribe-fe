@@ -1,27 +1,42 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useSpeechRecognition, useSpeechSynthesis } from "react-speech-kit";
-import { FaStopCircle, FaCircle } from "react-icons/fa";
-import { AiFillSound } from "react-icons/ai";
+import React, { useState, useEffect, useContext, useRef } from "react";
+import { useSpeechRecognition } from "react-speech-kit";
+import { FaCircle, FaPauseCircle } from "react-icons/fa";
 import queryString from "query-string";
 
 import TranscriptContext from "../../contexts/TranscriptContext";
 import HistoryContext from "../../contexts/HistoryContext";
 
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  Scale,
+  useDisclosure
+} from "@chakra-ui/core";
+
 import "./NewTranscript.scss";
 
 export default function NewTranscript(props) {
-  const [voiceIndex, setVoiceIndex] = useState(null);
   const [next, setNext] = useState(false);
   const [recordingLength, setRecordingLength] = useState(0);
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   const [newValue, setNewValue] = useState("");
-  const { speak, voices } = useSpeechSynthesis();
-  const voice = voices[voiceIndex] || null;
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = React.useRef();
+
+  // This value is used to animate the recording icon
+  const [dimDot, setDimDot] = useState(false);
 
   const { history, setHistory } = useContext(HistoryContext);
-  const { postTranscript, transcript, getTranscript } = useContext(TranscriptContext);
+  const { postTranscript, transcript, getTranscript } = useContext(
+    TranscriptContext
+  );
 
   // Id of a parent, if any
   const { id } = props.match.params;
@@ -32,9 +47,8 @@ export default function NewTranscript(props) {
 
   const init = () => {
     // If we have an id but no data for it, get it
-    if(!transcript.currentTranscript && id)
-      getTranscript(id);
-  }
+    if (!transcript.currentTranscript && id) getTranscript(id);
+  };
 
   useEffect(init, [id]);
 
@@ -53,12 +67,25 @@ export default function NewTranscript(props) {
       } else {
         setNext(true);
       }
-    }
+    } else setNext(false);
   }, [props.location.search]);
 
   const { listen, listening, stop } = useSpeechRecognition({
     onResult: result => setNewValue(result)
   });
+
+  const animateRecording = () => {
+    setDimDot(true);
+    if (!listening) return;
+    setTimeout(() => {
+      setDimDot(false);
+      setTimeout(() => {
+        animateRecording();
+      }, 1000);
+    }, 1000);
+  };
+
+  useEffect(animateRecording, [listening]);
 
   const NextHandler = () => {
     if (listening) StopAndTime();
@@ -98,8 +125,15 @@ export default function NewTranscript(props) {
   };
 
   const handleDiscard = () => {
-    props.history.push("/new");
-    window.location.reload();
+    if (id) props.history.push(`/new/${id}`);
+    else props.history.push("/new");
+
+    setHistory(history.slice(0, history.length - 1));
+
+    setValue("");
+    setTitle("");
+    setRecordingLength(0);
+    setNewValue("");
   };
 
   const HandlePost = e => {
@@ -116,7 +150,7 @@ export default function NewTranscript(props) {
     };
 
     // If we have an id, assign it as the parent of this transcript
-    if(id) {
+    if (id) {
       obj.parent = id;
     }
 
@@ -124,7 +158,7 @@ export default function NewTranscript(props) {
       console.log(err);
       if (!err) {
         setHistory([]);
-        props.history.push(`/transcripts${id ? `/${id}` : ''}`);
+        props.history.push(`/transcripts${id ? `/${id}` : ""}`);
       } else {
         setError(err);
       }
@@ -138,51 +172,47 @@ export default function NewTranscript(props) {
           <div className="left">
             <h1>
               {id ? (
-                <span className='directory'>
-                  {transcript.currentTranscript.title}/ 
+                <span className="directory">
+                  {transcript.currentTranscript.title}/
                 </span>
               ) : (
                 ""
               )}
               New Transcript
             </h1>
-            <select
-              id="voice"
-              name="voice"
-              value={voiceIndex || ""}
-              onChange={event => {
-                setVoiceIndex(event.target.value);
-              }}
-            >
-              <option value="">Default</option>
-              {voices.map((option, index) => (
-                <option key={option.voiceURI} value={index}>
-                  {`${option.lang} - ${option.name}`}
-                </option>
-              ))}
-            </select>
+            <p className="instructions">
+              Click the record button below to begin recording, and click next
+              when you are done.
+              <br />
+              You will be able to correct any mistakes in the next step.
+              <br />
+              <strong>
+                Note: Your browser may request access to your microphone, which
+                is required for this to work!
+              </strong>
+            </p>
             <div className="buttons">
               <div
-                className="button"
-                onClick={() => speak({ text: value, voice, rate: 1, pitch: 1 })}
+                className={`button ${listening && "disabled"}`}
+                onClick={ListenAndTime}
               >
-                <AiFillSound />
-              </div>
-              <div className="button" onClick={StopAndTime}>
-                <FaStopCircle />
-              </div>
-              <div className="button" onClick={ListenAndTime}>
                 <FaCircle />
+              </div>
+              <div
+                className={`button ${!listening && "disabled"}`}
+                onClick={StopAndTime}
+              >
+                <FaPauseCircle />
               </div>
             </div>
           </div>
-          {listening && (
-            <div className="center">
-              <div className="rec">.</div>
-              <h2>RECORDING...</h2>
-            </div>
-          )}
           <div className="right">
+            {listening && (
+              <div className="recording">
+                <div className={`rec ${dimDot && "dim"}`}>.</div>
+                <h2>RECORDING...</h2>
+              </div>
+            )}
             <div className="buttons">
               <div
                 className={`button ${value.trim() === "" && "disabled"}`}
@@ -194,7 +224,7 @@ export default function NewTranscript(props) {
           </div>
         </div>
 
-        <textarea className="text" readOnly value={value} />
+        <textarea className="text read-only" readOnly value={value} />
       </div>
     );
   } else {
@@ -214,17 +244,18 @@ export default function NewTranscript(props) {
             <p className="error">{error}</p>
             <div className="buttons">
               <div
-                className={`button ${transcript.isPosting && "disabled"}`}
+                className={`button discard ${transcript.isPosting &&
+                  "disabled"}`}
+                onClick={onOpen}
+              >
+                DISCARD
+              </div>
+              <div
+                className={`button ${(transcript.isPosting || !title) &&
+                  "disabled"}`}
                 onClick={HandlePost}
               >
                 FINISH
-              </div>
-              <div
-                className={`button discard ${transcript.isPosting &&
-                  "disabled"}`}
-                onClick={handleDiscard}
-              >
-                DISCARD
               </div>
             </div>
           </div>
@@ -242,6 +273,33 @@ export default function NewTranscript(props) {
           value={value}
           onChange={event => setValue(event.target.value)}
         />
+        <Scale in={isOpen}>
+          {styles => (
+            <AlertDialog
+              leastDestructiveRef={cancelRef}
+              onClose={onClose}
+              isOpen={true}
+            >
+              <AlertDialogOverlay opacity={styles.opacity} />
+              <AlertDialogContent {...styles}>
+                <AlertDialogHeader>Discard Transcript?</AlertDialogHeader>
+                <AlertDialogBody>
+                  Are you sure you want to discard this transcript?
+                </AlertDialogBody>
+                <AlertDialogFooter>
+                  <div
+                    className="default-btn"
+                    ref={cancelRef}
+                    onClick={onClose}
+                  >
+                    No
+                  </div>
+                  <div onClick={handleDiscard} className="default-btn red">Yes</div>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </Scale>
       </div>
     );
   }

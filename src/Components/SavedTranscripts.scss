@@ -13,7 +13,8 @@
 
   .list {
     display: flex;
-    flex-flow: row wrap;
+    flex-flow: column nowrap;
+    width: 100%;
     
     .toolbar {
       display: flex;
@@ -38,36 +39,50 @@
       .right {
         display: flex;
         align-items: center;
+      }
+    }
 
-        .btn {
-          display: flex;
-          align-items: center;
-          img {
-            height: 16px;
-            margin-right: 6px;
-          }
+    .viewer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 4px;
+      
+      .icon, .name, .date-created, .duration {
+        margin: 8px;
+        cursor: pointer;
+        text-decoration: underline;
+      }
 
-          background-color: teal;
-          color: white;
-          padding: 8px;
-          font-weight: bold;
-          border-radius: 7px;
-          margin: 4px;
-          cursor: pointer;
+      .icon {
+        width: 40px;
+        margin: 8px;
+      }
 
-          transition: all 0.1s ease-in-out;
+      .name {
+        width: 50%;
+        margin: 8px;
+        min-width: 132px;
+        text-overflow: ellipsis;
+        cursor: pointer;
+        font-weight: bold;
+      }
 
-          &.disabled {
-            background-color: gray;
-            opacity: 0.7;
-            cursor: default;
-            pointer-events: none;
-          }
+      .date-created {
+        margin: 8px;
+        width: 35%;
+        min-width: 96px;
+        cursor: pointer;
+        font-weight: bold;
+      }
 
-          &:hover {
-            background-color: rgb(62, 173, 173);
-          }
-        }
+      .duration {
+        font-weight: bold;
+        text-align: right;
+        margin: 8px;
+        min-width: 70px;
+        width: 8%;
+        cursor: pointer;
       }
     }
 
