@@ -6,7 +6,7 @@
 
 ![MIT](https://img.shields.io/packagist/l/doctrine/orm.svg)
 ![React](https://img.shields.io/badge/react-v16.12.0-blue)
-![Travis-ci](https://travis-ci.com/Breath-Taken/BreathTaken-FE.svg?branch=master)
+![Travis-ci](https://travis-ci.com/scribe-notes/scribe-fe.svg?branch=master)
 
 # Key Features
 
