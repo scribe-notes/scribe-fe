@@ -15,12 +15,34 @@ import transcriptIcon from "../img/transcript.png";
 import "./TranscriptCard.scss";
 import ContextMenu from "./ContextMenu";
 
-export default function TranscriptCard(props) {
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  Scale,
+  Input,
+  useDisclosure
+} from "@chakra-ui/core";
 
+export default function TranscriptCard(props) {
   // If this is being rendered to create a folder,
   // this where the ref for the input will live
   const titleSetter = useRef(null);
   const toggleOptionsRef = useRef(null);
+
+  // If this is being rendered to create a folder
+  // or to edit something's title,
+  // this is where our field's data would live
+  const [newTitle, setNewTitle] = useState();
+
+  const [dialogAction, setDialogAction] = useState("rename");
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const cancelRef = useRef(null);
 
   const [dialogPosition, setDialogPosition] = useState({
     top: 0,
@@ -35,13 +57,6 @@ export default function TranscriptCard(props) {
     TranscriptContext
   );
 
-  // If this is being rendered to create a folder
-  // or to edit something's title,
-  // this is where our field's data would live
-  const [newTitle, setNewTitle] = useState(
-    props.title ? props.title : "New Folder"
-  );
-
   // Handle submitting a new folder
   const handleSubmit = e => {
     e.preventDefault();
@@ -51,8 +66,8 @@ export default function TranscriptCard(props) {
   const [showOptions, setShowOptions] = useState(false);
 
   useEffect(() => {
-    if (!showOptions) setNewTitle(props.title);
-  }, [showOptions, props.title]);
+    if (!isOpen) setNewTitle(props.title);
+  }, [isOpen, props.title]);
 
   // If we are creating a folder, focus the input
   // field right away
@@ -87,10 +102,34 @@ export default function TranscriptCard(props) {
     seconds = `0${seconds}`;
   }
 
-  // If we have changed the title
-  const handleDelete = e => {
+  const handleRename = () => {
+    setDialogAction("rename");
     setShowOptions(false);
-    deleteTranscript(props);
+    onOpen();
+  };
+
+  const renameThis = e => {
+    e && e.preventDefault();
+    updateTranscript({
+      title: newTitle,
+      _id: props._id,
+      parent: props.parent
+    }).then(err => {
+      onClose();
+    });
+  };
+
+  const deleteThis = () => {
+    deleteTranscript(props).then(err => {
+      onClose();
+    });
+  };
+
+  // If we have changed the title
+  const handleDelete = () => {
+    setDialogAction("delete");
+    setShowOptions(false);
+    onOpen();
   };
 
   const handleClickOutside = event => {
@@ -104,10 +143,9 @@ export default function TranscriptCard(props) {
     setShowOptions(!showOptions);
   };
 
-  const initDialogPosition = () => {
+  const updateDialogPosition = () => {
     if (toggleOptionsRef?.current) {
       const rect = toggleOptionsRef.current.getBoundingClientRect();
-      console.log(rect);
       setDialogPosition({
         top: rect.top,
         left: rect.left
@@ -115,14 +153,16 @@ export default function TranscriptCard(props) {
     }
   };
 
-  useEffect(initDialogPosition, [toggleOptionsRef]);
+  useEffect(updateDialogPosition, [toggleOptionsRef]);
 
   useEffect(() => {
     // Bind the event listener
     document.addEventListener("mousedown", handleClickOutside);
+    window.addEventListener("resize", updateDialogPosition);
     return () => {
       // Unbind the event listener on clean up
       document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("resize", updateDialogPosition);
     };
   });
 
@@ -139,7 +179,8 @@ export default function TranscriptCard(props) {
 
   const CONTEXT_OPTIONS = [
     {
-      name: "Edit"
+      name: "Rename",
+      action: handleRename
     },
     {
       name: "Share",
@@ -156,7 +197,7 @@ export default function TranscriptCard(props) {
       ref={thisCard}
       onClick={open}
       className={`transcript-card ${props.newFolder &&
-        "creating"} ${showOptions && "editing"} ${transcript.isUpdating &&
+        "creating"} ${showOptions && "active"} ${transcript.isUpdating &&
         "updating"} ${props.disabled && "disabled"}`}
     >
       <img
@@ -172,7 +213,7 @@ export default function TranscriptCard(props) {
               autoComplete="off"
               ref={titleSetter}
               onBlur={props.cancelFolder}
-              id="newTitle"
+              className="new-title"
               value={newTitle}
               onChange={e => setNewTitle(e.target.value)}
             />
@@ -192,38 +233,78 @@ export default function TranscriptCard(props) {
         position={dialogPosition}
         options={CONTEXT_OPTIONS}
       />
-      {/* <label>Rename {props.isGroup ? "folder" : "transcript"}</label>
-          <input
-            disabled={transcript.isUpdating}
-            id="newTitle"
-            value={newTitle}
-            onChange={e => setNewTitle(e.target.value)}
-          />
-          <div className="buttons">
-            <div
-              className={`share disabled ${transcript.isUpdating &&
-                "disabled"}`}
-            >
-              <img src={share} alt="" />
-              Share...
-            </div>
-            <div
-              disabled={transcript.isUpdating}
-              onClick={handleSaveDelete}
-              className={`${
-                props.title === newTitle ? "delete" : "share"
-              } ${transcript.isUpdating && "disabled"}`}
-            >
-              {props.title === newTitle ? "Delete" : "Save"}
-            </div>
-          </div> */}
       <img
         ref={toggleOptionsRef}
         onClick={toggleShowOptions}
-        className={`icon mini ${props.newFolder && "hidden"} ${showOptions && "active"}`}
+        className={`icon mini ${props.newFolder && "hidden"} ${showOptions &&
+          "active"}`}
         src={options}
         alt=""
       />
+      {/* Dialogs */}
+      <Scale in={isOpen}>
+        {styles => (
+          <AlertDialog
+            isOpen={isOpen}
+            leastDestructiveRef={cancelRef}
+            onClose={onClose}
+          >
+            <AlertDialogOverlay opacity={styles.opacity} />
+            <AlertDialogContent
+              {...styles}
+              style={{
+                borderRadius: "7px"
+              }}
+            >
+              <AlertDialogHeader>
+                {dialogAction === "rename" ? "Rename " : "Delete "}'
+                {props.title}'
+              </AlertDialogHeader>
+              <AlertDialogBody>
+                {dialogAction === "rename" ? (
+                  <form onSubmit={renameThis}>
+                    <label>Enter a new name below</label>
+                    <Input
+                      style={{
+                        boxSizing: "border-box",
+                        fontWeight: "bold",
+                        marginTop: "8px"
+                      }}
+                      placeholder={
+                        props.isGroup ? "New Folder" : "New Transcript"
+                      }
+                      className="new-title"
+                      value={newTitle}
+                      onChange={e => setNewTitle(e.target.value)}
+                    />
+                  </form>
+                ) : (
+                  "Are you sure you want to delete this? This cannot be undone"
+                )}
+              </AlertDialogBody>
+              <AlertDialogFooter>
+                <div
+                  className={`default-btn ${transcript.isUpdating &&
+                    "disabled"}`}
+                  ref={cancelRef}
+                  onClick={onClose}
+                >
+                  Cancel
+                </div>
+                <div
+                  className={`default-btn ${transcript.isUpdating &&
+                    "disabled"}`}
+                  onClick={dialogAction === "rename" ? renameThis : deleteThis
+                  }
+                  style={dialogAction === 'delete' ? { backgroundColor: 'crimson' } : null}
+                >
+                  {dialogAction === "rename" ? "Rename" : "Delete"}
+                </div>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+      </Scale>
     </div>
   );
 }

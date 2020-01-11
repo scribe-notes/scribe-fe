@@ -39,36 +39,6 @@
       .right {
         display: flex;
         align-items: center;
-
-        .btn {
-          display: flex;
-          align-items: center;
-          img {
-            height: 16px;
-            margin-right: 6px;
-          }
-
-          background-color: teal;
-          color: white;
-          padding: 8px;
-          font-weight: bold;
-          border-radius: 7px;
-          margin: 4px;
-          cursor: pointer;
-
-          transition: all 0.1s ease-in-out;
-
-          &.disabled {
-            background-color: gray;
-            opacity: 0.7;
-            cursor: default;
-            pointer-events: none;
-          }
-
-          &:hover {
-            background-color: rgb(62, 173, 173);
-          }
-        }
       }
     }
 

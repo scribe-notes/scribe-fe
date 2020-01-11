@@ -80,7 +80,7 @@
     min-width: 96px;
   }
 
-  #newTitle {
+  .new-title {
     width: 100%;
     display: flex;
     flex-shrink: 500;
@@ -108,7 +108,7 @@
     text-align: right;
   }
 
-  &:hover {
+  &:hover, &.active {
     background-color: white;
   }
 

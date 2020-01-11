@@ -157,7 +157,7 @@ export default function SavedTranscripts(props) {
     setTranscript({
       ...transcript,
       transcripts: transcript.transcripts.sort((a, b) => {
-        if(!a || !b)  return 0;
+        if (!a || !b) return 0;
         switch (sortBy) {
           case SORT_OPTIONS[0]: {
             if (sortReverse) return b.title - a.title;
@@ -203,7 +203,7 @@ export default function SavedTranscripts(props) {
             <div className="right">
               <div
                 onClick={handleCreate}
-                className={`btn ${transcript.isGetting && "disabled"}`}
+                className={`default-btn ${(transcript.isGetting || transcript.isPosting) && "disabled"}`}
               >
                 + NEW TRANSCRIPT
               </div>
@@ -211,12 +211,12 @@ export default function SavedTranscripts(props) {
                 <>
                   <div
                     onClick={createFolder}
-                    className={`btn ${transcript.isGetting && "disabled"}`}
+                    className={`default-btn ${(transcript.isGetting || transcript.isPosting) && "disabled"}`}
                   >
                     + NEW FOLDER
                   </div>
                   {id && (
-                    <div className="btn disabled">
+                    <div className="default-btn disabled">
                       <img src={share} alt="" />
                       SHARE FOLDER
                     </div>
@@ -259,7 +259,11 @@ export default function SavedTranscripts(props) {
                 if (!t.createdAt) newFolder = true;
                 return (
                   <TranscriptCard
-                    disabled={transcript.isPosting || transcript.isGetting || transcript.isUpdating}
+                    disabled={
+                      transcript.isPosting ||
+                      transcript.isGetting ||
+                      transcript.isUpdating
+                    }
                     pageTitle={pageTitle}
                     history={props.history}
                     submitFolder={submitFolder}

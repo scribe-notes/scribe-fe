@@ -159,7 +159,6 @@ function App() {
 
   const deleteTranscript = transcript => {
     setTranscriptUpdating(true);
-    console.log(transcript);
     return AxiosWithAuth()
       .delete(`${process.env.REACT_APP_BACKEND}/transcripts/${transcript._id}`)
       .then(res => {
