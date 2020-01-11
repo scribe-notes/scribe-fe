@@ -172,7 +172,7 @@ function App() {
       .catch(err => {
         setTranscriptError(err.response?.data?.message)
         console.error(err.response);
-        return err.response?.data?.message;
+        return err.response?.data;
       });
   };
 

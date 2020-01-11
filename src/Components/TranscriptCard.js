@@ -36,9 +36,10 @@ export default function TranscriptCard(props) {
   // If this is being rendered to create a folder
   // or to edit something's title,
   // this is where our field's data would live
-  const [newTitle, setNewTitle] = useState();
+  const [newTitle, setNewTitle] = useState('New Folder');
 
   const [dialogAction, setDialogAction] = useState("rename");
+  const [dialogError, setDialogError] = useState('');
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -102,32 +103,46 @@ export default function TranscriptCard(props) {
     seconds = `0${seconds}`;
   }
 
+  const handleClose = () => {
+    if(!transcript.isUpdating && !dialogAction === 'rename') onClose();
+  }
+
   const handleRename = () => {
     setDialogAction("rename");
     setShowOptions(false);
+    setDialogError('');
     onOpen();
   };
 
   const renameThis = e => {
+    setDialogError('');
     e && e.preventDefault();
+    if(newTitle.trim() === '')
+      return setDialogError('Name cannot be blank');
     updateTranscript({
       title: newTitle,
       _id: props._id,
       parent: props.parent
     }).then(err => {
-      onClose();
+      if(err)
+        setDialogError(err);
+      else onClose();
     });
   };
 
   const deleteThis = () => {
+    setDialogError('');
     deleteTranscript(props).then(err => {
-      onClose();
+      // Handle error
+      if(err)
+        setDialogError(`We've run into a problem. Please try again.`);
     });
   };
 
   // If we have changed the title
   const handleDelete = () => {
     setDialogAction("delete");
+    setDialogError('');
     setShowOptions(false);
     onOpen();
   };
@@ -247,7 +262,7 @@ export default function TranscriptCard(props) {
           <AlertDialog
             isOpen={isOpen}
             leastDestructiveRef={cancelRef}
-            onClose={onClose}
+            onClose={handleClose}
           >
             <AlertDialogOverlay opacity={styles.opacity} />
             <AlertDialogContent
@@ -281,8 +296,9 @@ export default function TranscriptCard(props) {
                 ) : (
                   "Are you sure you want to delete this? This cannot be undone"
                 )}
+                <p className='error'>{dialogError}</p>
               </AlertDialogBody>
-              <AlertDialogFooter>
+              <AlertDialogFooter style={{alignItems: 'center'}}>
                 <div
                   className={`default-btn ${transcript.isUpdating &&
                     "disabled"}`}
@@ -294,7 +310,7 @@ export default function TranscriptCard(props) {
                 <div
                   className={`default-btn ${transcript.isUpdating &&
                     "disabled"}`}
-                  onClick={dialogAction === "rename" ? renameThis : deleteThis
+                    onClick={dialogAction === "rename" ? renameThis : deleteThis
                   }
                   style={dialogAction === 'delete' ? { backgroundColor: 'crimson' } : null}
                 >
