@@ -1,0 +1,29 @@
+.options {
+  height: max-content;
+  position: absolute;
+  box-shadow: 0 0 3px -1px gray;
+  width: 120px;
+  transform: translateX(-130px);
+  background-color: white;
+  border-radius: 5px;
+
+  .option {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    display: flex;
+    height: 32px;
+    align-items: center;
+
+    .icon, img {
+      width: 20px;
+      height: 20px;
+      padding: 4px;
+      margin: 8px;
+    }
+
+    &:hover {
+      background-color: rgb(224, 224, 224);
+    }
+  }
+}

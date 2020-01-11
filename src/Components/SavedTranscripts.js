@@ -16,6 +16,9 @@ import "./SavedTranscripts.scss";
 
 export default function SavedTranscripts(props) {
   const FILTER_OPTIONS = ["all", "mine", "shared"];
+  const SORT_OPTIONS = ["name", "createdAt", "duration"];
+
+  const [sortReverse, setSortReverse] = useState(false);
 
   // Id of a specific transcript/folder
   const { id } = props.match.params;
@@ -23,6 +26,7 @@ export default function SavedTranscripts(props) {
   const [pageTitle, setPageTitle] = useState("Saved Transcripts");
 
   const [filterBy, setFilterBy] = useState(FILTER_OPTIONS[0]);
+  const [sortBy, setSortBy] = useState(SORT_OPTIONS[0]);
 
   const { user } = useContext(UserContext);
   const {
@@ -116,6 +120,65 @@ export default function SavedTranscripts(props) {
     postTranscript(transcript);
   };
 
+  const setSort = newSort => {
+    console.log(newSort);
+    switch (newSort) {
+      case SORT_OPTIONS[0]: {
+        // Name
+        if (newSort === SORT_OPTIONS[0])
+          // Reverse
+          setSortReverse(!sortReverse);
+        else {
+          setSortReverse(false);
+          setSortBy(SORT_OPTIONS[0]);
+        }
+        break;
+      }
+      case SORT_OPTIONS[1]: {
+        if (newSort === SORT_OPTIONS[1]) setSortReverse(!sortReverse);
+        else {
+          setSortReverse(false);
+          setSortBy(SORT_OPTIONS[1]);
+        }
+        break;
+      }
+      case SORT_OPTIONS[2]: {
+        if (newSort === SORT_OPTIONS[2]) {
+          setSortReverse(false);
+          setSortBy(SORT_OPTIONS[1]);
+        }
+        break;
+      }
+      default: {
+        return;
+      }
+    }
+    console.log(transcript.transcripts);
+    setTranscript({
+      ...transcript,
+      transcripts: transcript.transcripts.sort((a, b) => {
+        if(!a || !b)  return 0;
+        switch (sortBy) {
+          case SORT_OPTIONS[0]: {
+            if (sortReverse) return b.title - a.title;
+            else return a.title - b.title;
+          }
+          case SORT_OPTIONS[1]: {
+            if (sortReverse) return b.createdAt - a.createdAt;
+            else return a.createdAt - b.createdAt;
+          }
+          case SORT_OPTIONS[2]: {
+            if (sortReverse) return b.recordingLength - a.recordingLength;
+            else return a.recordingLength - b.recordingLength;
+          }
+          default: {
+            return a.title - b.title;
+          }
+        }
+      })
+    });
+  };
+
   return (
     <div className="saved-transcripts">
       <h2>{transcript.isGetting ? <Spinner /> : pageTitle}</h2>
@@ -162,11 +225,16 @@ export default function SavedTranscripts(props) {
               )}
             </div>
           </div>
-          <div className='viewer'>
-              <div className='icon'></div>
-              <div className='name'>Name</div>
-              <div className='date-created'>Date Created</div>
-              <div className='duration'>Duration</div>
+          <div className="viewer">
+            <div className="icon"></div>
+            <div className="name" onClick={() => setSort("name")}>
+              Name
+            </div>
+            <div className="date-created" onClick={() => setSort("createdAt")}>
+              Date Created
+            </div>
+            <div className="duration">Duration</div>
+            <div className="icon"></div>
           </div>
           {transcript.isGetting ? (
             <div className="stretch">
@@ -185,19 +253,20 @@ export default function SavedTranscripts(props) {
                   }
                 }
               })
-              .map(transcript => {
-                if (!transcript) return null;
+              .map(t => {
+                if (!t) return null;
                 let newFolder = false;
-                if (!transcript.createdAt) newFolder = true;
+                if (!t.createdAt) newFolder = true;
                 return (
                   <TranscriptCard
+                    disabled={transcript.isPosting || transcript.isGetting || transcript.isUpdating}
                     pageTitle={pageTitle}
                     history={props.history}
                     submitFolder={submitFolder}
                     cancelFolder={cancelFolder}
                     newFolder={newFolder}
-                    key={transcript._id}
-                    {...transcript}
+                    key={t._id}
+                    {...t}
                   />
                 );
               })

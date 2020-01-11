@@ -74,26 +74,33 @@
 
     .viewer {
       display: flex;
+      justify-content: space-between;
       align-items: center;
       
+      .icon, .name, .date-created, .duration {
+        margin: 8px;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+
       .icon {
         width: 40px;
         margin: 8px;
-        border-right: 1px solid black;
       }
 
       .name {
         width: 50%;
         margin: 8px;
-        border-right: 1px solid black;
+        min-width: 132px;
+        text-overflow: ellipsis;
         cursor: pointer;
         font-weight: bold;
       }
 
       .date-created {
         margin: 8px;
-        border-right: 1px solid black;
-        width: 30%;
+        width: 35%;
+        min-width: 96px;
         cursor: pointer;
         font-weight: bold;
       }
@@ -102,8 +109,8 @@
         font-weight: bold;
         text-align: right;
         margin: 8px;
-        flex-shrink: 500;
-        width: 100%;
+        min-width: 70px;
+        width: 8%;
         cursor: pointer;
       }
     }

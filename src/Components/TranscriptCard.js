@@ -1,29 +1,35 @@
 import React, { useEffect, useRef, useState, useContext } from "react";
 
-import HistoryContext from '../contexts/HistoryContext';
+import HistoryContext from "../contexts/HistoryContext";
 import TranscriptContext from "../contexts/TranscriptContext";
 
-import moment from 'moment';
+import moment from "moment";
 
-import share from '../img/share-white.png';
-
-import { Spinner } from "@chakra-ui/core";
+import share from "../img/share-black.png";
 
 import options from "../img/options.png";
 
-import folderIcon from "../img/folder.png"
-import transcriptIcon from "../img/transcript.jpg"
+import folderIcon from "../img/folder.png";
+import transcriptIcon from "../img/transcript.png";
 
 import "./TranscriptCard.scss";
+import ContextMenu from "./ContextMenu";
 
 export default function TranscriptCard(props) {
+
   // If this is being rendered to create a folder,
   // this where the ref for the input will live
   const titleSetter = useRef(null);
-  
+  const toggleOptionsRef = useRef(null);
+
+  const [dialogPosition, setDialogPosition] = useState({
+    top: 0,
+    left: 0
+  });
+
   const thisCard = useRef(null);
 
-  const {history, setHistory} = useContext(HistoryContext);
+  const { history, setHistory } = useContext(HistoryContext);
 
   const { transcript, deleteTranscript, updateTranscript } = useContext(
     TranscriptContext
@@ -82,29 +88,34 @@ export default function TranscriptCard(props) {
   }
 
   // If we have changed the title
-  const handleSaveDelete = e => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (props.title === newTitle) {
-      deleteTranscript(props);
-    } else {
-      console.log(props.parent);
-      updateTranscript({ title: newTitle, _id: props._id, parent: props.parent }).then(err => {
-        if (!err) setShowOptions(false);
-      });
-    }
+  const handleDelete = e => {
+    setShowOptions(false);
+    deleteTranscript(props);
   };
 
-  function handleClickOutside(event) {
-    if (showOptions && thisCard.current && !thisCard.current.contains(event.target)) {
+  const handleClickOutside = event => {
+    if (showOptions && !thisCard?.current?.contains(event.target)) {
       setShowOptions(false);
     }
-  }
+  };
 
   const toggleShowOptions = e => {
     e.stopPropagation();
     setShowOptions(!showOptions);
-  }
+  };
+
+  const initDialogPosition = () => {
+    if (toggleOptionsRef?.current) {
+      const rect = toggleOptionsRef.current.getBoundingClientRect();
+      console.log(rect);
+      setDialogPosition({
+        top: rect.top,
+        left: rect.left
+      });
+    }
+  };
+
+  useEffect(initDialogPosition, [toggleOptionsRef]);
 
   useEffect(() => {
     // Bind the event listener
@@ -121,23 +132,43 @@ export default function TranscriptCard(props) {
       {
         title: props.pageTitle,
         path: window.location.pathname
-      }]);
-    props.history.push(`/transcripts/${props._id}`)
-  }
+      }
+    ]);
+    props.history.push(`/transcripts/${props._id}`);
+  };
+
+  const CONTEXT_OPTIONS = [
+    {
+      name: "Edit"
+    },
+    {
+      name: "Share",
+      icon: share
+    },
+    {
+      name: "Delete",
+      action: handleDelete
+    }
+  ];
 
   return (
-    <div ref={thisCard}
-         onClick={showOptions ? null : open}
+    <div
+      ref={thisCard}
+      onClick={open}
       className={`transcript-card ${props.newFolder &&
         "creating"} ${showOptions && "editing"} ${transcript.isUpdating &&
-        "updating"}`}
+        "updating"} ${props.disabled && "disabled"}`}
     >
-      <img className='icon' src={ props.isGroup ? folderIcon : transcriptIcon } alt='' />
+      <img
+        className="icon"
+        src={props.isGroup || props.newFolder ? folderIcon : transcriptIcon}
+        alt=""
+      />
       <div className="title">
         {props.newFolder ? (
           <form onSubmit={handleSubmit}>
-            <h3 className="create">Create Folder</h3>
             <input
+              disabled={transcript.isPosting}
               autoComplete="off"
               ref={titleSetter}
               onBlur={props.cancelFolder}
@@ -147,26 +178,21 @@ export default function TranscriptCard(props) {
             />
           </form>
         ) : (
-          <>
-            <h3>{showOptions ? `Edit '${props.title}'` : props.title}</h3>
-            {/* <div className="options-toggle">
-              { showOptions && transcript.isUpdating ? <Spinner /> :
-              <img
-                onClick={toggleShowOptions}
-                className="icon"
-                src={options}
-                alt=""
-              />}
-            </div> */}
-          </>
+          <h3>{props.title}</h3>
         )}
       </div>
-      <div className='date-created'>
-        {moment(props.createdAt).fromNow()}
+      <div className="date-created">
+        {!props.newFolder && moment(props.createdAt).fromNow()}
       </div>
-      {showOptions ? (
-        <form onSubmit={handleSaveDelete} className="options">
-          <label>Rename {props.isGroup ? "folder" : "transcript"}</label>
+      <p className="length">
+        {!props.isGroup && !props.newFolder && `${hours}:${minutes}:${seconds}`}
+      </p>
+      <ContextMenu
+        show={showOptions}
+        position={dialogPosition}
+        options={CONTEXT_OPTIONS}
+      />
+      {/* <label>Rename {props.isGroup ? "folder" : "transcript"}</label>
           <input
             disabled={transcript.isUpdating}
             id="newTitle"
@@ -174,8 +200,11 @@ export default function TranscriptCard(props) {
             onChange={e => setNewTitle(e.target.value)}
           />
           <div className="buttons">
-            <div className={`share disabled ${transcript.isUpdating && "disabled"}`}>
-              <img src={share} alt='' />
+            <div
+              className={`share disabled ${transcript.isUpdating &&
+                "disabled"}`}
+            >
+              <img src={share} alt="" />
               Share...
             </div>
             <div
@@ -187,17 +216,14 @@ export default function TranscriptCard(props) {
             >
               {props.title === newTitle ? "Delete" : "Save"}
             </div>
-          </div>
-        </form>
-      ) : (
-        <>
-          <p className="length">
-            {!props.isGroup && !props.newFolder
-              ? `${hours}:${minutes}:${seconds}`
-              : `Folder`}
-          </p>
-        </>
-      )}
+          </div> */}
+      <img
+        ref={toggleOptionsRef}
+        onClick={toggleShowOptions}
+        className={`icon mini ${props.newFolder && "hidden"} ${showOptions && "active"}`}
+        src={options}
+        alt=""
+      />
     </div>
   );
 }

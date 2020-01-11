@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import "./Dropdown.scss";
 
 const Dropdown = props => {
+  const dropdown = useRef(null);
+
   const [open, setOpen] = useState(false);
 
   const handleToggle = () => {
@@ -14,8 +16,23 @@ const Dropdown = props => {
     if (props.onChange) props.onChange(option);
   };
 
+  const handleClickOutside = event => {
+    if(!dropdown?.current?.contains(event.target)) {
+      setOpen(false);
+    }
+  }
+
+  useEffect(() => {
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  });
+
   return (
-    <div className="dropdown" onClick={handleToggle}>
+    <div ref={dropdown} className="dropdown" onClick={handleToggle}>
       <div className="value">
         {props.allcaps ? props.value && props.value.toUpperCase() : props.value}
         <div className={`drawer ${!open && "hidden"}`}>
