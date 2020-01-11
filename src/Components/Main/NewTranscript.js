@@ -28,7 +28,7 @@ export default function NewTranscript(props) {
   const [newValue, setNewValue] = useState("");
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef = React.useRef();
+  const cancelRef = useRef();
 
   // This value is used to animate the recording icon
   const [dimDot, setDimDot] = useState(false);
