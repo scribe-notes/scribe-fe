@@ -1,10 +1,21 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { useSpeechRecognition } from "react-speech-kit";
 import { FaCircle, FaPauseCircle } from "react-icons/fa";
 import queryString from "query-string";
 
 import TranscriptContext from "../../contexts/TranscriptContext";
 import HistoryContext from "../../contexts/HistoryContext";
+
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  Scale,
+  useDisclosure
+} from "@chakra-ui/core";
 
 import "./NewTranscript.scss";
 
@@ -15,6 +26,9 @@ export default function NewTranscript(props) {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   const [newValue, setNewValue] = useState("");
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = React.useRef();
 
   // This value is used to animate the recording icon
   const [dimDot, setDimDot] = useState(false);
@@ -111,15 +125,15 @@ export default function NewTranscript(props) {
   };
 
   const handleDiscard = () => {
-    if(id)  props.history.push(`/new/${id}`);
-    else props.history.push('/new');
+    if (id) props.history.push(`/new/${id}`);
+    else props.history.push("/new");
 
     setHistory(history.slice(0, history.length - 1));
 
-    setValue('');
-    setTitle('');
+    setValue("");
+    setTitle("");
     setRecordingLength(0);
-    setNewValue('');
+    setNewValue("");
   };
 
   const HandlePost = e => {
@@ -178,17 +192,23 @@ export default function NewTranscript(props) {
               </strong>
             </p>
             <div className="buttons">
-              <div className={`button ${listening && 'disabled'}`} onClick={ListenAndTime}>
+              <div
+                className={`button ${listening && "disabled"}`}
+                onClick={ListenAndTime}
+              >
                 <FaCircle />
               </div>
-              <div className={`button ${!listening && 'disabled'}`} onClick={StopAndTime}>
+              <div
+                className={`button ${!listening && "disabled"}`}
+                onClick={StopAndTime}
+              >
                 <FaPauseCircle />
               </div>
             </div>
           </div>
           <div className="right">
             {listening && (
-              <div className='recording'>
+              <div className="recording">
                 <div className={`rec ${dimDot && "dim"}`}>.</div>
                 <h2>RECORDING...</h2>
               </div>
@@ -226,12 +246,13 @@ export default function NewTranscript(props) {
               <div
                 className={`button discard ${transcript.isPosting &&
                   "disabled"}`}
-                onClick={handleDiscard}
+                onClick={onOpen}
               >
                 DISCARD
               </div>
               <div
-                className={`button ${(transcript.isPosting || !title) && "disabled"}`}
+                className={`button ${(transcript.isPosting || !title) &&
+                  "disabled"}`}
                 onClick={HandlePost}
               >
                 FINISH
@@ -252,6 +273,33 @@ export default function NewTranscript(props) {
           value={value}
           onChange={event => setValue(event.target.value)}
         />
+        <Scale in={isOpen}>
+          {styles => (
+            <AlertDialog
+              leastDestructiveRef={cancelRef}
+              onClose={onClose}
+              isOpen={true}
+            >
+              <AlertDialogOverlay opacity={styles.opacity} />
+              <AlertDialogContent {...styles}>
+                <AlertDialogHeader>Discard Transcript?</AlertDialogHeader>
+                <AlertDialogBody>
+                  Are you sure you want to discard this transcript?
+                </AlertDialogBody>
+                <AlertDialogFooter>
+                  <div
+                    className="default-btn"
+                    ref={cancelRef}
+                    onClick={onClose}
+                  >
+                    No
+                  </div>
+                  <div onClick={handleDiscard} className="default-btn red">Yes</div>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </Scale>
       </div>
     );
   }

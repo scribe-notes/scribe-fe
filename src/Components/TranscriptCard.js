@@ -309,10 +309,9 @@ export default function TranscriptCard(props) {
                 </div>
                 <div
                   className={`default-btn ${transcript.isUpdating &&
-                    "disabled"}`}
+                    "disabled"} ${dialogAction === 'delete' && 'red'}`}
                     onClick={dialogAction === "rename" ? renameThis : deleteThis
                   }
-                  style={dialogAction === 'delete' ? { backgroundColor: 'crimson' } : null}
                 >
                   {dialogAction === "rename" ? "Rename" : "Delete"}
                 </div>
