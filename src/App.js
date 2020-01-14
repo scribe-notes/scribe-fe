@@ -111,7 +111,7 @@ function App() {
       })
       .catch(err => {
         console.log(err);
-        setTranscriptError(err.response.data.message);
+        setTranscriptError(err.response?.data?.message);
         return err.respone?.data?.message;
       });
   };
@@ -130,9 +130,9 @@ function App() {
         else setTranscripts(res.data);
       })
       .catch(err => {
-        console.error(err.response.data);
-        setTranscriptError(err.response.data);
-        return err.response.data;
+        console.error(err.response?.data);
+        setTranscriptError(err.response?.data);
+        return err.response?.data;
       });
   };
 
@@ -153,7 +153,7 @@ function App() {
       })
       .catch(err => {
         console.error(err.response);
-        setTranscriptError(err.response.data.message);
+        setTranscriptError(err.response?.data?.message);
       });
   };
 
@@ -170,26 +170,27 @@ function App() {
         else setTranscripts(res.data);
       })
       .catch(err => {
-        console.error(err);
-        return err.response.data.message;
+        setTranscriptError(err.response?.data?.message)
+        console.error(err.response);
+        return err.response?.data;
       });
   };
 
   const getMyTranscripts = () => {
+    setTranscriptGetting(true);
     if (!user.data) {
       if(user.isLoading) setQueueTranscripts(true);
       return;
     }
-    setTranscriptGetting(true);
     return AxiosWithAuth()
       .get(`${process.env.REACT_APP_BACKEND}/transcripts/mine`)
       .then(res => {
         setTranscripts(res.data);
       })
       .catch(err => {
-        console.log(err);
-        setTranscriptError(err.response.data.message);
-        return err.respone.data.message;
+        console.log(err.response);
+        setTranscriptError(err.response?.data?.message);
+        return err.response?.data?.message;
       });
   };
 
@@ -222,7 +223,7 @@ function App() {
     return axios
       .post(`${process.env.REACT_APP_BACKEND}/login`, { username, password })
       .then(res => {
-        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("token", res.data?.token);
         assignUserData(res.data);
       })
       .catch(err => {
@@ -241,13 +242,13 @@ function App() {
         username
       })
       .then(res => {
-        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("token", res.data?.token);
         assignUserData(res.data);
       })
       .catch(err => {
-        console.error(err.response.data.message);
-        setUserError(err.response.data.message);
-        return err.response.data.message;
+        console.error(err.response?.data?.message);
+        setUserError(err.response?.data?.message);
+        return err.response?.data?.message;
       });
   };
 

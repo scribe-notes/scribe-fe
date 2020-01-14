@@ -1,32 +1,47 @@
 .transcript-card {
-  border: 1px solid gray;
-  width: 256px;
-  height: 164px;
-  border-radius: 12px;
-  padding: 8px;
-  margin: 8px;
+  box-sizing: border-box;
+  align-items: center;
+  border-top: 1px solid gray;
+  width: 100%;
+  height: 72px;
   user-select: none;
   cursor: pointer;
-  background-color: white;
 
   display: flex;
-  flex-direction: column;
   justify-content: space-between;
+  align-items: center;
 
   transition: all 0.1s ease-in-out;
 
-  &.creating {
-    border-color: lightseagreen;
-    border-style: dashed;
+  .hidden {
+    opacity: 0;
+    pointer-events: none;
   }
 
-  &.editing {
-    background-color: teal;
-    color: white;
+  &.creating {
+    border: 1px dashed lightseagreen;
     cursor: default;
-    
-    &.updating {
-      background-color: gray;
+  }
+
+  .icon {
+    height: 40px;
+    width: 40px;
+    margin: 4px;
+    padding: 4px;
+
+    &.mini {
+      height: 24px;
+      width: 24px;
+      margin: 10px;
+      padding: 10px;
+
+      border-radius: 50%;
+
+      transition: all 0.1s ease-in-out;
+
+      &:hover, &.active {
+        background-color: rgb(236, 236, 236);
+      }
     }
   }
 
@@ -34,8 +49,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 50%;
+    min-width: 132px;
+    text-overflow: ellipsis;
+    margin: 8px;
 
     h3 {
+      padding: 0;
       display: block;
       white-space: nowrap;
       height: 25px;
@@ -47,21 +67,6 @@
     .create {
       color: lightseagreen;
     }
-
-    .options-toggle {
-      width: 32px;
-      cursor: pointer;
-      
-      img {
-        width: 100%;
-
-        transition: all 0.2s ease-in-out;
-
-        &:hover {
-          transform: rotate(45deg);
-        }
-      }
-    }
   }
 
   h3 {
@@ -69,7 +74,13 @@
     margin: 0.5em 0;
   }
 
-  #newTitle {
+  .date-created {
+    margin: 8px;
+    width: 35%;
+    min-width: 96px;
+  }
+
+  .new-title {
     width: 100%;
     display: flex;
     flex-shrink: 500;
@@ -89,68 +100,22 @@
     }
   }
 
-  .options {
-    height: 100%;
-
-    .buttons {
-      display: flex;
-      width: 100%;
-      justify-content: space-between;
-
-      .delete, .share {
-        cursor: pointer;
-        width: 49%;
-        padding: 8px;
-        margin: 4px;
-        text-align: center;
-        font-weight: bold;
-        border-radius: 7px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        transition: all 0.1s ease-in-out;
-
-        img {
-          height: 16px;
-          margin-right: 6px;
-        }
-
-        &.disabled {
-          background-color: gray;
-          opacity: 0.7;
-          cursor: default;
-          pointer-events: none;
-        }
-      }
-
-      .share {
-        background-color: lightseagreen;
-
-        &:hover {
-          background-color: rgb(101, 223, 217);
-        }
-      }
-
-      .delete {
-        background-color: crimson;
-
-        &:hover {
-          background-color: red;
-        }
-      }
-    }
-  }
-
   .length {
+    margin: 8px;
+    min-width: 70px;
+    width: 8%;
     color: gray;
+    text-align: right;
   }
 
-  .preview {
-    flex-grow: 500;
+  &:hover, &.active {
+    background-color: white;
   }
 
-  &:hover {
-    box-shadow: 0 0 6px -2px gray;
+  &.disabled {
+    cursor: default;
+    color: white;
+    background-color: rgb(206, 206, 206);
+    pointer-events: none;
   }
 }
