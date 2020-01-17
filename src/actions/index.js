@@ -10,7 +10,6 @@ export {
   draftNewFolder,
   cancelNewFolder
 } from "./transcripts";
-export { getLastLocation, recordLocation, clearHistory } from "./history";
 
 // Action Helper
 
