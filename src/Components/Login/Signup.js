@@ -1,12 +1,15 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Redirect } from "react-router-dom";
-import UserContext from "../../contexts/UserContext";
 import Swal from "sweetalert2";
 import "./Form.scss";
 import { Button, PseudoBox } from "@chakra-ui/core";
 import { Box, Heading } from "@chakra-ui/core";
 
-const Signup = () => {
+import { connect } from 'react-redux';
+
+import { signup } from '../../actions';
+
+const Signup = props => {
   const [error, setError] = useState(null);
 
   const [input, setInput] = useState({
@@ -15,8 +18,6 @@ const Signup = () => {
     password: "",
     password_confirmation: ""
   });
-
-  const userContext = useContext(UserContext);
 
   const handleChange = e => {
     setError('');
@@ -32,31 +33,24 @@ const Signup = () => {
     if (input.password !== input.password_confirmation)
       return setError("Passwords do not match!");
 
-    userContext.signup(input)
-    .then(err => {
-      if (!err) {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Welcome to Scribe!",
-          showConfirmButton: false,
-          timer: 1500
-        });
-      } else setError(err);
-    });
+    props.signup(input);
   };
 
-  if (error === false) {
-    Swal.fire({
-      position: "center",
-      icon: "success",
-      title: "Thanks for signing up!",
-      showConfirmButton: false,
-      timer: 1500
-    });
-  }
+  useEffect(() => {
+    if(!props.user.error && props.user.data) {
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Welcome to Scribe!",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    } else if(props.user.error) {
+      setError(props.user.error);
+    }
+  }, [props.user.data, props.user.error])
 
-  if (userContext.user.data) {
+  if (props.user.data) {
     return <Redirect to="/" />;
   }
   return (
@@ -112,7 +106,7 @@ const Signup = () => {
           <h1 className="heading">Create an account</h1>
           <form onSubmit={handleLoginSubmit} className="signup-form">
             <input
-              disabled={userContext.user.isLoading}
+              disabled={props.user.isLoading}
               className="form-input"
               placeholder="Email"
               value={input.email}
@@ -121,7 +115,7 @@ const Signup = () => {
               type="email"
             />
             <input
-              disabled={userContext.user.isLoading}
+              disabled={props.user.isLoading}
               className="form-input"
               placeholder="Username"
               onChange={handleChange}
@@ -129,7 +123,7 @@ const Signup = () => {
               value={input.username}
             />
             <input
-              disabled={userContext.user.isLoading}
+              disabled={props.user.isLoading}
               className="form-input"
               placeholder="Password"
               name="password"
@@ -138,7 +132,7 @@ const Signup = () => {
               type="password"
             />
             <input
-              disabled={userContext.user.isLoading}
+              disabled={props.user.isLoading}
               className="form-input"
               placeholder="Confirm Password"
               name="password_confirmation"
@@ -150,7 +144,7 @@ const Signup = () => {
               Password must be at least 8 characters long.
             </span>
             <Button
-              disabled={userContext.user.isLoading}
+              disabled={props.user.isLoading}
               variantColor="teal"
               width="60%"
               marginTop="8px"
@@ -169,4 +163,8 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+const mapStateToProps = state => ({
+  user: state.user
+})
+
+export default connect(mapStateToProps, { signup })(Signup);
