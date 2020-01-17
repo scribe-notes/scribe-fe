@@ -29,24 +29,24 @@ export const types = {
 
 // Get user's transcripts from top level (root directory)
 export const getRootTranscripts = () => dispatch => {
-  request(dispatch, 'get', '/transcripts/mine', types.GET_TRANSCRIPT_DATA);
+  return request(dispatch, 'get', '/transcripts/mine', types.GET_TRANSCRIPT_DATA);
 };
 
 // Get a specific transcript
 export const getTranscript = (id = null) => dispatch => {
-  request(dispatch, 'get', `/transcripts/${id}`, types.GET_TRANSCRIPT_DATA);
+  return request(dispatch, 'get', `/transcripts/${id}`, types.GET_TRANSCRIPT_DATA);
 };
 
 export const postTranscript = data => dispatch => {
-  request(dispatch, 'post', `/transcripts/`, types.POST_TRANSCRIPT, data);
+  return request(dispatch, 'post', `/transcripts/`, types.POST_TRANSCRIPT, data);
 };
 
 export const updateTranscript = data => dispatch => {
-  request(dispatch, 'put', `/transcripts/${data._id}`, types.UPDATE_TRANSCRIPT, data);
+  return request(dispatch, 'put', `/transcripts/${data._id}`, types.UPDATE_TRANSCRIPT, data);
 };
 
 export const deleteTranscript = id => dispatch => {
-  request(dispatch, 'delete', `/transcripts/${id}`, types.DELETE_TRANSCRIPT).then(() => {
+  return request(dispatch, 'delete', `/transcripts/${id}`, types.DELETE_TRANSCRIPT).then(() => {
     dispatch({
       type: types.REMOVE_FROM_STATE,
       payload: id
