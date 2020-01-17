@@ -30,6 +30,7 @@
   },
   "scripts": {
     "cypress": "cypress open",
+    "cypress:all": "cypress run",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

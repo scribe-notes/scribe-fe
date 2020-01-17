@@ -28,6 +28,10 @@
 * React
 * React Context API for state management
 * Sass
+## Testing
+* Cypress
+* React_Testing_Library
+* Jest
 
 # Installation Instructions
 
