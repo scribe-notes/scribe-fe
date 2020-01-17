@@ -1,9 +1,9 @@
 import { combineReducers } from 'redux';
 
-import user from './user';
-import transcripts from './transcripts';
+import userReducer from './userReducer';
+import transcriptReducer from './transcriptReducer';
 
 export default combineReducers({
-  user,
-  transcripts
+  user: userReducer,
+  transcripts: transcriptReducer
 });

@@ -6,7 +6,7 @@ const initialState = {
   data: null
 }
 
-export default (state = initialState, action) => {
+const transcriptReducer = (state = initialState, action) => {
   switch(action.type) {
     case types.POST_TRANSCRIPT.START: {
       return {
@@ -124,3 +124,5 @@ const addOneTranscript = (transcript, state) => {
     data
   }
 }
+
+export default transcriptReducer;

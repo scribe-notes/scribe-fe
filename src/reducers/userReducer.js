@@ -6,7 +6,7 @@ const initialState = {
   error: null
 };
 
-export default (state = initialState, action) => {
+const userReducer = (state = initialState, action) => {
   switch (action.type) {
     case types.LOGIN.START: {
       return {
@@ -43,3 +43,5 @@ export default (state = initialState, action) => {
       return state;
   }
 };
+
+export default userReducer;
