@@ -2,15 +2,17 @@ import React, { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 
 import HistoryContext from "../contexts/HistoryContext";
-import UserContext from "../contexts/UserContext";
 
 import { Spinner } from "@chakra-ui/core";
 
 import "./Navbar.scss";
 
-export default function Navbar() {
+import { connect } from 'react-redux';
+
+import { logout } from '../actions';
+
+const Navbar = props => {
   const { setHistory } = useContext(HistoryContext);
-  const { user, logout } = useContext(UserContext);
 
   return (
     <div className="navbar">
@@ -25,9 +27,9 @@ export default function Navbar() {
         >
           My Transcripts
         </NavLink>
-        {user.isLoading ? (
+        {props.user.isLoading ? (
           <Spinner />
-        ) : user.data === null ? (
+        ) : props.user.data === null ? (
           <Link onClick={() => setHistory([])} to="/login">
             Log In
           </Link>
@@ -37,8 +39,7 @@ export default function Navbar() {
             type="submit"
             onClick={() => {
               setHistory([]);
-              localStorage.removeItem("token");
-              logout();
+              props.logout();
             }}
           >
             Logout
@@ -47,9 +48,9 @@ export default function Navbar() {
       </div>
       <div className="right">
         <div className="username">
-          {user.data && (
+          {props.user.data && (
             <span>
-              Signed in as <strong>{user.data.username}</strong>
+              Signed in as <strong>{props.user.data.username}</strong>
             </span>
           )}
         </div>
@@ -57,3 +58,9 @@ export default function Navbar() {
     </div>
   );
 }
+
+const mapStateToProps = state => ({
+  user: state.user
+})
+
+export default connect(mapStateToProps, { logout })(Navbar);

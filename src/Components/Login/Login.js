@@ -1,24 +1,22 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Redirect } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Button, PseudoBox } from "@chakra-ui/core";
 import { Box, Heading } from "@chakra-ui/core";
-import UserContext from "../../contexts/UserContext";
 import "./LoginForm.scss";
 
-const Login = () => {
-  const [error, setError] = useState('');
+import { connect } from 'react-redux';
 
+import { login } from '../../actions';
+
+const Login = props => {
   const [input, setInput] = useState({
     username: "",
     password: ""
   });
 
-  const {login, user} = useContext(UserContext);
-
   const handleChange = e => {
-    setError('');
     setInput({
       ...input,
       [e.target.name]: e.target.value
@@ -28,21 +26,23 @@ const Login = () => {
   const handleLoginSubmit = e => {
     e.preventDefault();
 
-    login(input)
-    .then(err => {
-      if (!err) {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: `Welcome back to Scribe!`,
-          showConfirmButton: false,
-          timer: 1500
-        });
-      } else setError(err);
-    });
+    props.login(input);
   };
 
-  if (user.data)
+  useEffect(() => {
+    if(!props.user.error && props.user.data) {
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: `Welcome back to Scribe!`,
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
+  }, [props.user.error, props.user.data]);
+
+
+  if (props.user.data)
     return <Redirect to="/" />;
 
   return (
@@ -58,7 +58,7 @@ const Login = () => {
           <h1 className="heading">Log in to your account</h1>
           <form onSubmit={handleLoginSubmit} className="login-form">
             <input
-              disabled={user.isLoading}
+              disabled={props.user.isLoading}
               className="form-input"
               placeholder="Username"
               onChange={handleChange}
@@ -66,7 +66,7 @@ const Login = () => {
               value={input.username}
             />
             <input
-              disabled={user.isLoading}
+              disabled={props.user.isLoading}
               className="form-input"
               placeholder="Password"
               name="password"
@@ -75,7 +75,7 @@ const Login = () => {
               type="password"
             />
             <Button
-              disabled={user.isLoading}
+              disabled={props.user.isLoading}
               variantColor="teal"
               width="60%"
               rounded="20px"
@@ -84,7 +84,7 @@ const Login = () => {
               Login
             </Button>
           </form>
-          <div className="error">{error}</div>
+          <div className="error">{props.user.error}</div>
         </Box>
       </div>
       <div className="right">
@@ -129,4 +129,8 @@ const Login = () => {
   );
 };
 
-export default Login;
+const mapStateToProps = state => ({
+  user: state.user
+});
+
+export default connect(mapStateToProps, { login })(Login);

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState, useContext } from "react";
 
 import HistoryContext from "../contexts/HistoryContext";
-import TranscriptContext from "../contexts/TranscriptContext";
 
 import moment from "moment";
 
@@ -15,6 +14,10 @@ import transcriptIcon from "../img/transcript.png";
 import "./TranscriptCard.scss";
 import ContextMenu from "./ContextMenu";
 
+import { connect } from "react-redux";
+
+import { updateTranscript, deleteTranscript } from "../actions";
+
 import {
   AlertDialog,
   AlertDialogBody,
@@ -27,7 +30,7 @@ import {
   useDisclosure
 } from "@chakra-ui/core";
 
-export default function TranscriptCard(props) {
+const TranscriptCard = props => {
   // If this is being rendered to create a folder,
   // this where the ref for the input will live
   const titleSetter = useRef(null);
@@ -36,10 +39,10 @@ export default function TranscriptCard(props) {
   // If this is being rendered to create a folder
   // or to edit something's title,
   // this is where our field's data would live
-  const [newTitle, setNewTitle] = useState('New Folder');
+  const [newTitle, setNewTitle] = useState("New Folder");
 
   const [dialogAction, setDialogAction] = useState("rename");
-  const [dialogError, setDialogError] = useState('');
+  const [dialogError, setDialogError] = useState("");
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -53,10 +56,6 @@ export default function TranscriptCard(props) {
   const thisCard = useRef(null);
 
   const { history, setHistory } = useContext(HistoryContext);
-
-  const { transcript, deleteTranscript, updateTranscript } = useContext(
-    TranscriptContext
-  );
 
   // Handle submitting a new folder
   const handleSubmit = e => {
@@ -103,46 +102,34 @@ export default function TranscriptCard(props) {
     seconds = `0${seconds}`;
   }
 
-  const handleClose = () => {
-    if(!transcript.isUpdating && !dialogAction === 'rename') onClose();
-  }
-
   const handleRename = () => {
     setDialogAction("rename");
     setShowOptions(false);
-    setDialogError('');
+    setDialogError("");
     onOpen();
   };
 
   const renameThis = e => {
-    setDialogError('');
+    setDialogError("");
     e && e.preventDefault();
-    if(newTitle.trim() === '')
-      return setDialogError('Name cannot be blank');
-    updateTranscript({
+    if (newTitle.trim() === "") return setDialogError("Name cannot be blank");
+    props.updateTranscript({
       title: newTitle,
       _id: props._id,
       parent: props.parent
-    }).then(err => {
-      if(err)
-        setDialogError(err);
-      else onClose();
     });
+    onClose();
   };
 
   const deleteThis = () => {
-    setDialogError('');
-    deleteTranscript(props).then(err => {
-      // Handle error
-      if(err)
-        setDialogError(`We've run into a problem. Please try again.`);
-    });
+    setDialogError("");
+    props.deleteTranscript(props._id);
   };
 
   // If we have changed the title
   const handleDelete = () => {
     setDialogAction("delete");
-    setDialogError('');
+    setDialogError("");
     setShowOptions(false);
     onOpen();
   };
@@ -168,7 +155,10 @@ export default function TranscriptCard(props) {
     }
   };
 
-  useEffect(updateDialogPosition, [toggleOptionsRef]);
+  useEffect(updateDialogPosition, [
+    toggleOptionsRef,
+    props.transcripts.isLoading
+  ]);
 
   useEffect(() => {
     // Bind the event listener
@@ -212,11 +202,12 @@ export default function TranscriptCard(props) {
       ref={thisCard}
       onClick={open}
       className={`transcript-card ${props.newFolder &&
-        "creating"} ${showOptions && "active"} ${transcript.isUpdating &&
+        "creating"} ${showOptions && "active"} ${props.transcripts.isLoading &&
         "updating"} ${props.disabled && "disabled"}`}
     >
       <img
         className="icon"
+        style={{ opacity: props.newFolder ? 0.8 : 1 }}
         src={props.isGroup || props.newFolder ? folderIcon : transcriptIcon}
         alt=""
       />
@@ -224,7 +215,7 @@ export default function TranscriptCard(props) {
         {props.newFolder ? (
           <form onSubmit={handleSubmit}>
             <input
-              disabled={transcript.isPosting}
+              disabled={props.transcripts.isLoading}
               autoComplete="off"
               ref={titleSetter}
               onBlur={props.cancelFolder}
@@ -262,7 +253,7 @@ export default function TranscriptCard(props) {
           <AlertDialog
             isOpen={isOpen}
             leastDestructiveRef={cancelRef}
-            onClose={handleClose}
+            onClose={onClose}
           >
             <AlertDialogOverlay opacity={styles.opacity} />
             <AlertDialogContent
@@ -293,14 +284,17 @@ export default function TranscriptCard(props) {
                       onChange={e => setNewTitle(e.target.value)}
                     />
                   </form>
+                ) : props.isGroup ? (
+                  `Are you sure you want to delete this folder? This folder
+                  and all of its contents will be deleted. This cannot be undone.`
                 ) : (
-                  "Are you sure you want to delete this? This cannot be undone"
+                  `Are you sure you want to delete this transcript? This cannot be undone.`
                 )}
-                <p className='error'>{dialogError}</p>
+                <p className="error">{dialogError}</p>
               </AlertDialogBody>
-              <AlertDialogFooter style={{alignItems: 'center'}}>
+              <AlertDialogFooter style={{ alignItems: "center" }}>
                 <div
-                  className={`default-btn ${transcript.isUpdating &&
+                  className={`default-btn ${props.transcripts.isLoading &&
                     "disabled"}`}
                   ref={cancelRef}
                   onClick={onClose}
@@ -308,10 +302,9 @@ export default function TranscriptCard(props) {
                   Cancel
                 </div>
                 <div
-                  className={`default-btn ${transcript.isUpdating &&
-                    "disabled"} ${dialogAction === 'delete' && 'red'}`}
-                    onClick={dialogAction === "rename" ? renameThis : deleteThis
-                  }
+                  className={`default-btn ${props.transcripts.isLoading &&
+                    "disabled"} ${dialogAction === "delete" && "red"}`}
+                  onClick={dialogAction === "rename" ? renameThis : deleteThis}
                 >
                   {dialogAction === "rename" ? "Rename" : "Delete"}
                 </div>
@@ -322,4 +315,12 @@ export default function TranscriptCard(props) {
       </Scale>
     </div>
   );
-}
+};
+
+const mapStateToProps = state => ({
+  transcripts: state.transcripts
+});
+
+export default connect(mapStateToProps, { updateTranscript, deleteTranscript })(
+  TranscriptCard
+);

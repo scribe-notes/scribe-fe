@@ -1,9 +1,7 @@
-import React, { useEffect, useState, useContext, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useContext } from "react";
 import { Link } from "react-router-dom";
 import TranscriptCard from "./TranscriptCard";
 import HistoryContext from "../contexts/HistoryContext";
-import UserContext from "../contexts/UserContext";
-import TranscriptContext from "../contexts/TranscriptContext";
 import Transcript from "./Transcript";
 
 import share from "../img/share-white.png";
@@ -14,11 +12,18 @@ import Dropdown from "./Dropdown";
 
 import "./SavedTranscripts.scss";
 
-export default function SavedTranscripts(props) {
-  const FILTER_OPTIONS = ["all", "mine", "shared"];
-  const SORT_OPTIONS = ["name", "createdAt", "duration"];
+import { connect } from "react-redux";
 
-  const [sortReverse, setSortReverse] = useState(false);
+import {
+  getRootTranscripts,
+  getTranscript,
+  postTranscript,
+  draftNewFolder,
+  cancelNewFolder
+} from "../actions";
+
+const SavedTranscripts = props => {
+  const FILTER_OPTIONS = ["all", "mine", "shared"];
 
   // Id of a specific transcript/folder
   const { id } = props.match.params;
@@ -26,16 +31,6 @@ export default function SavedTranscripts(props) {
   const [pageTitle, setPageTitle] = useState("Saved Transcripts");
 
   const [filterBy, setFilterBy] = useState(FILTER_OPTIONS[0]);
-  const [sortBy, setSortBy] = useState(SORT_OPTIONS[0]);
-
-  const { user } = useContext(UserContext);
-  const {
-    postTranscript,
-    getMyTranscripts,
-    transcript,
-    setTranscript,
-    getTranscript
-  } = useContext(TranscriptContext);
 
   const { history, setHistory } = useContext(HistoryContext);
 
@@ -46,32 +41,30 @@ export default function SavedTranscripts(props) {
     // TODO: Check to make sure we have access to the parent directory
     // before doing this
 
-    if (id && history.length === 0 && transcript.currentTranscript._id === id) {
+    if (id && history.length === 0 && props.transcripts.data?._id === id) {
       let title = "Saved Transcripts";
       let path = "/transcripts";
       console.log("creating history...");
-      if (transcript.currentTranscript.parent) {
+      if (props.transcripts.data.parent) {
         //TODO: Get the correct title of parent directory
-        title = transcript.currentTranscript.parent.title;
-        path = `/transcripts/${transcript.currentTranscript.parent}`;
+        title = props.transcripts.data.parent.title;
+        path = `/transcripts/${props.transcripts.data.parent}`;
       }
       setHistory([...history, { title, path }]);
     }
-  }, [id, history, transcript, setHistory]);
+  }, [id, history, props.transcripts, setHistory]);
 
   useEffect(() => {
-    if (transcript.currentTranscript) {
-      setPageTitle(transcript.currentTranscript.title);
+    if (props.transcripts.data?.children) {
+      setPageTitle(props.transcripts.data?.title);
       validateHistory();
     } else if (!id) setPageTitle("Saved Transcripts");
-  }, [transcript.currentTranscript, id, validateHistory]);
+  }, [props.transcripts.data, id, validateHistory]);
 
   const getContents = () => {
     if (id) {
-      getTranscript(id).then(err => {
-        // Handle an error
-      });
-    } else getMyTranscripts();
+      props.getTranscript(id);
+    } else props.getRootTranscripts();
   };
 
   useEffect(getContents, [id]);
@@ -92,99 +85,38 @@ export default function SavedTranscripts(props) {
   };
 
   const createFolder = () => {
-    setTranscript({
-      ...transcript,
-      transcripts: [
-        ...transcript.transcripts,
-        {
-          creator: user.id,
-          _id: "newFolder"
-        }
-      ]
+    props.draftNewFolder({
+      creator: props.user.data._id,
+      _id: "newFolder"
     });
   };
 
   const cancelFolder = () => {
-    const transcripts = transcript.transcripts.filter(t => {
-      return t._id !== "newFolder";
-    });
-    setTranscript({
-      ...transcript,
-      transcripts
-    });
+    props.cancelNewFolder("newFolder");
   };
 
   const submitFolder = title => {
     const transcript = { title, isGroup: true, parent: id };
 
-    postTranscript(transcript);
+    props.cancelNewFolder("newFolder");
+    props.postTranscript(transcript);
   };
 
-  const setSort = newSort => {
-    console.log(newSort);
-    switch (newSort) {
-      case SORT_OPTIONS[0]: {
-        // Name
-        if (newSort === SORT_OPTIONS[0])
-          // Reverse
-          setSortReverse(!sortReverse);
-        else {
-          setSortReverse(false);
-          setSortBy(SORT_OPTIONS[0]);
-        }
-        break;
-      }
-      case SORT_OPTIONS[1]: {
-        if (newSort === SORT_OPTIONS[1]) setSortReverse(!sortReverse);
-        else {
-          setSortReverse(false);
-          setSortBy(SORT_OPTIONS[1]);
-        }
-        break;
-      }
-      case SORT_OPTIONS[2]: {
-        if (newSort === SORT_OPTIONS[2]) {
-          setSortReverse(false);
-          setSortBy(SORT_OPTIONS[1]);
-        }
-        break;
-      }
-      default: {
-        return;
-      }
-    }
-    console.log(transcript.transcripts);
-    setTranscript({
-      ...transcript,
-      transcripts: transcript.transcripts.sort((a, b) => {
-        if (!a || !b) return 0;
-        switch (sortBy) {
-          case SORT_OPTIONS[0]: {
-            if (sortReverse) return b.title - a.title;
-            else return a.title - b.title;
-          }
-          case SORT_OPTIONS[1]: {
-            if (sortReverse) return b.createdAt - a.createdAt;
-            else return a.createdAt - b.createdAt;
-          }
-          case SORT_OPTIONS[2]: {
-            if (sortReverse) return b.recordingLength - a.recordingLength;
-            else return a.recordingLength - b.recordingLength;
-          }
-          default: {
-            return a.title - b.title;
-          }
-        }
-      })
-    });
-  };
+  // Should we view a singular transcript?
+  const viewSingular =
+    id &&
+    props.transcripts.data &&
+    !props.transcripts.data.length &&
+    !props.transcripts.data.isGroup;
+
+  const transcripts = id
+    ? !viewSingular && props.transcripts.data?.children
+    : props.transcripts.data;
 
   return (
     <div className="saved-transcripts">
-      <h2>{transcript.isGetting ? <Spinner /> : pageTitle}</h2>
-      {id &&
-      transcript.currentTranscript &&
-      !transcript.currentTranscript.isGroup ? (
+      <h2>{props.transcripts.isLoading ? <Spinner /> : pageTitle}</h2>
+      {viewSingular ? (
         <Transcript />
       ) : (
         <div className="list">
@@ -203,7 +135,8 @@ export default function SavedTranscripts(props) {
             <div className="right">
               <div
                 onClick={handleCreate}
-                className={`default-btn ${(transcript.isGetting || transcript.isPosting) && "disabled"}`}
+                className={`default-btn ${props.transcripts.isLoading &&
+                  "disabled"}`}
               >
                 + NEW TRANSCRIPT
               </div>
@@ -211,7 +144,8 @@ export default function SavedTranscripts(props) {
                 <>
                   <div
                     onClick={createFolder}
-                    className={`default-btn ${(transcript.isGetting || transcript.isPosting) && "disabled"}`}
+                    className={`default-btn ${props.transcripts.isLoading &&
+                      "disabled"}`}
                   >
                     + NEW FOLDER
                   </div>
@@ -227,27 +161,27 @@ export default function SavedTranscripts(props) {
           </div>
           <div className="viewer">
             <div className="icon"></div>
-            <div className="name" onClick={() => setSort("name")}>
+            <div className="name">
               Name
             </div>
-            <div className="date-created" onClick={() => setSort("createdAt")}>
+            <div className="date-created">
               Date Created
             </div>
             <div className="duration">Duration</div>
             <div className="icon"></div>
           </div>
-          {transcript.isGetting ? (
+          {props.transcripts.isLoading && !props.transcripts.data ? (
             <div className="stretch">
               <Spinner />
             </div>
-          ) : transcript.transcripts && transcript.transcripts.length > 0 ? (
-            transcript.transcripts
+          ) : transcripts && transcripts.length > 0 ? (
+            transcripts
               .filter(transcript => {
                 switch (filterBy) {
                   case "mine":
-                    return transcript.creator === user.data._id;
+                    return transcript.creator === props.user.data._id;
                   case "shared":
-                    return transcript.creator !== user.data._id;
+                    return transcript.creator !== props.user.data._id;
                   default: {
                     return transcript;
                   }
@@ -259,11 +193,7 @@ export default function SavedTranscripts(props) {
                 if (!t.createdAt) newFolder = true;
                 return (
                   <TranscriptCard
-                    disabled={
-                      transcript.isPosting ||
-                      transcript.isGetting ||
-                      transcript.isUpdating
-                    }
+                    disabled={props.transcripts.isLoading}
                     pageTitle={pageTitle}
                     history={props.history}
                     submitFolder={submitFolder}
@@ -286,4 +216,17 @@ export default function SavedTranscripts(props) {
       )}
     </div>
   );
-}
+};
+
+const mapStateToProps = state => ({
+  transcripts: state.transcripts,
+  user: state.user
+});
+
+export default connect(mapStateToProps, {
+  getRootTranscripts,
+  getTranscript,
+  postTranscript,
+  draftNewFolder,
+  cancelNewFolder
+})(SavedTranscripts);
