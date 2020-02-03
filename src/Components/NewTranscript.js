@@ -319,7 +319,8 @@ const NewTranscript = props => {
             <br />
             {!supported && <strong className='error'>
               Unfortunately, it appears your browser does not support voice recognition!
-              Please try again on a difference device or browser.
+              Please try again on a difference device or browser. We recommend using
+              Google Chrome.
             </strong>}
           </p>
           <div className='buttons'>
