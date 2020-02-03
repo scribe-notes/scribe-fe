@@ -111,14 +111,19 @@ const NewTranscript = props => {
 
   useEffect(animateRecording, [listening]);
 
-  const NextHandler = () => {
+  // handleStop allows another function to call
+  // NextHandler without letting it call
+  // StopAndTime()
+  // Useful when handling stopping and timing
+  // outside of this function
+  const NextHandler = (handleStop = true) => {
     let clear = true;
 
-    if (listening) clear = StopAndTime();
+    if (listening && handleStop) clear = StopAndTime();
 
     if(!clear) {
       setQueueNext(true);
-      return
+      return;
     };
 
     // Get the current pathname
@@ -172,11 +177,12 @@ const NewTranscript = props => {
   const handleDelayedStop = () => {
     if(stopping && tempValue === '') {
       setStopping(false);
+      
       stop();
 
       if(queueNext) {
         setQueueNext(false);
-        NextHandler();
+        NextHandler(false);
       }
     }
   }
