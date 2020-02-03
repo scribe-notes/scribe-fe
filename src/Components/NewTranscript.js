@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import { useSpeechRecognition } from 'react-speech-kit';
+import useSpeechRecognition from '../util/useSpeechRecognition';
 import { FaCircle, FaPauseCircle } from 'react-icons/fa';
 import queryString from 'query-string';
 
@@ -17,7 +17,8 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   Scale,
-  useDisclosure
+  useDisclosure,
+  Spinner
 } from '@chakra-ui/core';
 
 import './NewTranscript.scss';
@@ -29,6 +30,9 @@ const NewTranscript = props => {
   const [value, setValue] = useState('');
   const [error, setError] = useState('');
   const [newValue, setNewValue] = useState('');
+  const [tempValue, setTempValue] = useState('');
+  const [stopping, setStopping] = useState(false);
+  const [queueNext, setQueueNext] = useState(false);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef();
@@ -81,7 +85,12 @@ const NewTranscript = props => {
   }, [props.location.search]);
 
   const { listen, listening, stop } = useSpeechRecognition({
-    onResult: result => setNewValue(result)
+    onResult: result => setTempValue(result),
+    onInterimResult: result => { 
+      setTempValue('');
+      setNewValue(result);
+      return stopping;
+    }
   });
 
   const animateRecording = () => {
@@ -98,7 +107,15 @@ const NewTranscript = props => {
   useEffect(animateRecording, [listening]);
 
   const NextHandler = () => {
-    if (listening) StopAndTime();
+    let clear = true;
+
+    if (listening) clear = StopAndTime();
+
+    if(!clear) {
+      setQueueNext(true);
+      return
+    };
+
     // Get the current pathname
     let currentPath = window.location.pathname;
 
@@ -130,13 +147,36 @@ const NewTranscript = props => {
   const ListenAndTime = () => {
     setRecordingLength(Date.now());
 
-    listen({ interimResults: false });
+    listen({ interimResults: true });
   };
 
   const StopAndTime = () => {
     setRecordingLength(Math.round((Date.now() - recordingLength) / 1000));
+    if(tempValue) {
+      setStopping(true);
+      return false;
+    }
+    // We only do this if there is no tempValue,
+    // meaning we are not missing any part of the recording
     stop();
+    return true;
   };
+
+  // This is what will be responsible for stopping speech recognition
+  // after the last tempValue has been cleared
+  const handleDelayedStop = () => {
+    if(stopping && tempValue === '') {
+      setStopping(false);
+      stop();
+
+      if(queueNext) {
+        setQueueNext(false);
+        NextHandler();
+      }
+    }
+  }
+
+  useEffect(handleDelayedStop, [tempValue])
 
   const handleDiscard = () => {
     if (id) props.history.push(`/new/${id}`);
@@ -274,13 +314,13 @@ const NewTranscript = props => {
           </p>
           <div className='buttons'>
             <div
-              className={`button ${listening && 'disabled'}`}
+              className={`button ${(listening || stopping) && 'disabled'}`}
               onClick={ListenAndTime}
             >
               <FaCircle />
             </div>
             <div
-              className={`button ${!listening && 'disabled'}`}
+              className={`button ${(!listening || stopping) && 'disabled'}`}
               onClick={StopAndTime}
             >
               <FaPauseCircle />
@@ -288,15 +328,16 @@ const NewTranscript = props => {
           </div>
         </div>
         <div className='right'>
-          {listening && (
+          {listening && !stopping && (
             <div className='recording'>
               <div className={`rec ${dimDot && 'dim'}`}>.</div>
               <h2>RECORDING...</h2>
             </div>
           )}
           <div className='buttons'>
+            {stopping && <Spinner />}
             <div
-              className={`button ${value.trim() === '' && 'disabled'}`}
+              className={`button ${(value.trim() === '' || stopping) && 'disabled'}`}
               onClick={NextHandler}
             >
               Next
@@ -306,7 +347,7 @@ const NewTranscript = props => {
       </div>
 
       <div className='text-container'>
-        <textarea className='text read-only' readOnly value={value} />
+        <textarea className='text read-only' readOnly value={value + ' ' + tempValue} />
       </div>
     </div>
   );
