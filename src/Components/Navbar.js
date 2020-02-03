@@ -17,7 +17,7 @@ const Navbar = props => {
   return (
     <div className="navbar">
       <div className="left">
-        <Link onClick={() => setHistory([])} to="/transcripts">
+        <Link className='no-hover' onClick={() => setHistory([])} to="/transcripts">
           <h2 className="title">scribe</h2>
         </Link>
         <NavLink

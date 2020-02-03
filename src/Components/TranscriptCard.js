@@ -148,16 +148,21 @@ const TranscriptCard = props => {
   const updateDialogPosition = () => {
     if (toggleOptionsRef?.current) {
       const rect = toggleOptionsRef.current.getBoundingClientRect();
+      console.log(props.title, rect);
+      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      const scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
+
       setDialogPosition({
-        top: rect.top,
-        left: rect.left
+        top: rect.top + scrollTop,
+        left: rect.left - scrollLeft
       });
     }
   };
 
   useEffect(updateDialogPosition, [
     toggleOptionsRef,
-    props.transcripts.isLoading
+    props.transcripts.isLoading,
+    isOpen
   ]);
 
   useEffect(() => {
@@ -254,6 +259,7 @@ const TranscriptCard = props => {
             isOpen={isOpen}
             leastDestructiveRef={cancelRef}
             onClose={onClose}
+            
           >
             <AlertDialogOverlay opacity={styles.opacity} />
             <AlertDialogContent
@@ -274,13 +280,14 @@ const TranscriptCard = props => {
                       style={{
                         boxSizing: "border-box",
                         fontWeight: "bold",
-                        marginTop: "8px"
+                        marginTop: "8px",
                       }}
                       placeholder={
                         props.isGroup ? "New Folder" : "New Transcript"
                       }
                       className="new-title"
                       value={newTitle}
+                      onFocus={e => e.target.select()}
                       onChange={e => setNewTitle(e.target.value)}
                     />
                   </form>

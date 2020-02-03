@@ -1,8 +1,8 @@
 .new-transcript {
   display: flex;
   flex-direction: column;
-  background-color: rgb(250, 250, 250);
-  height: 100%;
+  min-height: 100%;
+  padding: 16px;
 
   .controls {
     user-select: none;
@@ -11,6 +11,11 @@
     height: max-content;
 
     margin: 0.5rem 2.5rem;
+
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+
+    border-bottom: 1px solid gray;
 
     .directory{
       color: teal;
@@ -63,6 +68,7 @@
       .buttons {
         display: flex;
         justify-content: flex-end;
+        align-items: center;
       }
 
       p {
@@ -115,22 +121,47 @@
     }
   }
 
-  .title {
-    height: 16px;
-    font-size: 20px;
-    margin: 0 2.5rem;
-    border: 1px solid gray;
-    border-radius: 12px;
-    text-align: left;
-    padding: 12px 1rem;
+  .text-container {
+    width: 100%;
+    max-width: 1440px;
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    align-items: center;
+    box-sizing: border-box;
+    margin-top: 1rem;
+    
+    .title {
+      width: 100%;
+      height: 40px;
+      font-size: 20px;
+      margin: 0 2.5rem;
+      border: 1px solid rgb(158, 158, 158);
+      border-radius: 12px;
+      text-align: left;
+      padding: 12px 1rem;
+      box-sizing: border-box;
+
+      transition: all 0.1s ease-in-out;
+
+
+
+    }
+  
+    .text {
+      width: 100%;
+      line-height: 1.5;
+      border: 1px solid rgb(158, 158, 158);
+      resize: none;
+      border-radius: 12px;
+      margin-top: 1rem;
+      padding: 16px;
+      min-height: 50vh;
+      box-sizing: border-box;
+
+    }
   }
 
-  .text {
-    padding: 1rem 0.5rem;
-    height: 480px;
-    margin: 1rem 2.5rem;
-    border-radius: 16px;
-  }
 
   .text, .title {
     &:focus {
@@ -138,7 +169,8 @@
     }
 
     &.read-only {
-      background-color: rgb(241, 241, 241);
+      background-color: rgb(228, 228, 228);
+      pointer-events: none;
     }
   }
 

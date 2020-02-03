@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import TranscriptCard from "./TranscriptCard";
 import HistoryContext from "../contexts/HistoryContext";
@@ -34,32 +34,10 @@ const SavedTranscripts = props => {
 
   const { history, setHistory } = useContext(HistoryContext);
 
-  const validateHistory = useCallback(() => {
-    // Here, we ensure that we have a history item to take us up a level
-    // if we first load into a directory
-
-    // TODO: Check to make sure we have access to the parent directory
-    // before doing this
-
-    if (id && history.length === 0 && props.transcripts.data?._id === id) {
-      let title = "Saved Transcripts";
-      let path = "/transcripts";
-      console.log("creating history...");
-      if (props.transcripts.data.parent) {
-        //TODO: Get the correct title of parent directory
-        title = props.transcripts.data.parent.title;
-        path = `/transcripts/${props.transcripts.data.parent}`;
-      }
-      setHistory([...history, { title, path }]);
-    }
-  }, [id, history, props.transcripts, setHistory]);
-
   useEffect(() => {
-    if (props.transcripts.data?.children) {
-      setPageTitle(props.transcripts.data?.title);
-      validateHistory();
-    } else if (!id) setPageTitle("Saved Transcripts");
-  }, [props.transcripts.data, id, validateHistory]);
+    if (!id) setPageTitle("Saved Transcripts");
+    else setPageTitle(props.transcripts.data?.title);
+  }, [props.transcripts.data, id]);
 
   const getContents = () => {
     if (id) {
