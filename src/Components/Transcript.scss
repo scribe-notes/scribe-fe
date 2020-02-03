@@ -31,11 +31,16 @@
   .text {
     box-sizing: border-box;
     width: 100%;
-    border: 1px solid gray;
-    border-radius: 16px;
+    max-width: 1440px;
+    line-height: 1.5;
+    border: 1px solid lightgray;
+    resize: none;
+    border-radius: 12px;
     margin-top: 1rem;
     padding: 16px;
     min-height: 50vh;
+
+    align-self: center;
 
     &:focus {
       outline: none;
