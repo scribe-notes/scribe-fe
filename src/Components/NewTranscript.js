@@ -84,7 +84,7 @@ const NewTranscript = props => {
     } else setNext(false);
   }, [props.location.search]);
 
-  const { listen, listening, stop } = useSpeechRecognition({
+  const { listen, listening, stop, supported } = useSpeechRecognition({
     onResult: result => setTempValue(result),
     onInterimResult: result => { 
       setTempValue('');
@@ -92,6 +92,11 @@ const NewTranscript = props => {
       return stopping;
     }
   });
+
+  useEffect(() => {
+    if(!supported)
+      alert("Looks like your browser does not support speech recognition! Please try again on a different device or browser");
+  }, [supported])
 
   const animateRecording = () => {
     setDimDot(true);
@@ -311,16 +316,21 @@ const NewTranscript = props => {
               Note: Your browser may request access to your microphone, which is
               required for this to work!
             </strong>
+            <br />
+            {!supported && <strong className='error'>
+              Unfortunately, it appears your browser does not support voice recognition!
+              Please try again on a difference device or browser.
+            </strong>}
           </p>
           <div className='buttons'>
             <div
-              className={`button ${(listening || stopping) && 'disabled'}`}
+              className={`button ${(listening || stopping || !supported) && 'disabled'}`}
               onClick={ListenAndTime}
             >
               <FaCircle />
             </div>
             <div
-              className={`button ${(!listening || stopping) && 'disabled'}`}
+              className={`button ${(!listening || stopping || !supported) && 'disabled'}`}
               onClick={StopAndTime}
             >
               <FaPauseCircle />
@@ -337,7 +347,7 @@ const NewTranscript = props => {
           <div className='buttons'>
             {stopping && <Spinner />}
             <div
-              className={`button ${(value.trim() === '' || stopping) && 'disabled'}`}
+              className={`button ${(value.trim() === '' || stopping || !supported) && 'disabled'}`}
               onClick={NextHandler}
             >
               Next
