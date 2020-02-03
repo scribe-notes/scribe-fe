@@ -274,13 +274,14 @@ const TranscriptCard = props => {
                       style={{
                         boxSizing: "border-box",
                         fontWeight: "bold",
-                        marginTop: "8px"
+                        marginTop: "8px",
                       }}
                       placeholder={
                         props.isGroup ? "New Folder" : "New Transcript"
                       }
                       className="new-title"
                       value={newTitle}
+                      onFocus={e => e.target.select()}
                       onChange={e => setNewTitle(e.target.value)}
                     />
                   </form>
